@@ -126,6 +126,7 @@
         }
         input[type="text"],
         input[type="date"],
+        input[type="number"],
         select {
             width: 100%;
             padding: 12px 15px;
@@ -141,16 +142,72 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
         }
-        .days-off-container {
-            margin-top: 20px;
-            padding: 20px;
-            background: var(--light);
+        .days-off-master-container {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #ef444415 0%, #dc262615 100%);
             border-radius: 12px;
+            border: 1px solid #fee2e2;
+        }
+        .days-off-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #fecaca;
+        }
+        .days-off-header h3 {
+            color: var(--danger);
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        .days-off-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 5px;
+            border-radius: 10px;
+        }
+        .days-off-tab {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .days-off-tab.active {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 2px 10px rgba(239, 68, 68, 0.3);
+        }
+        .days-off-tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .days-off-tab-content.active {
+            display: block;
+        }
+        .days-off-container {
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
         }
         .days-off-title {
             font-weight: 600;
             color: var(--dark);
             margin-bottom: 15px;
+            font-size: 1.05rem;
         }
         .weekday-selector {
             display: flex;
@@ -173,6 +230,98 @@
             background: var(--danger);
             color: white;
             border-color: var(--danger);
+        }
+        .alternating-days-container {
+            display: grid;
+            gap: 20px;
+        }
+        .alternating-day-item {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            position: relative;
+        }
+        .alternating-day-item.active {
+            border-color: var(--danger);
+            background: #fef2f2;
+        }
+        .alternating-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .alternating-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .alternating-option input[type="checkbox"],
+        .alternating-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+        }
+        .interval-list {
+            display: grid;
+            gap: 10px;
+        }
+        .interval-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+            align-items: center;
+        }
+        .interval-item input {
+            padding: 8px 12px;
+        }
+        .btn-remove {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-remove:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+        .btn-add {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+        .btn-add:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        .summary-box {
+            background: #fef2f2;
+            border: 2px solid var(--danger);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .summary-box h4 {
+            color: var(--danger);
+            margin-bottom: 10px;
+        }
+        .summary-list {
+            font-size: 0.9rem;
+            color: #6b7280;
+            line-height: 1.6;
         }
         .organization-section {
             margin-top: 30px;
@@ -485,13 +634,20 @@
             .form-grid {
                 grid-template-columns: 1fr;
             }
-           
+            .days-off-tabs {
+                flex-direction: column;
+            }
             .button-group {
                 flex-direction: column;
             }
-           
             .btn {
                 width: 100%;
+            }
+            .alternating-controls {
+                grid-template-columns: 1fr;
+            }
+            .interval-item {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -507,7 +663,7 @@
         <div class="form-container">
             <div class="info-card">
                 <h3>📚 Como funciona?</h3>
-                <p>Configure seu cronograma personalizado: escolha dias off, organize por Subject ou System, e reordene ou remova tópicos conforme sua necessidade. As aulas serão distribuídas uniformemente nos dias disponíveis.</p>
+                <p>Configure seu cronograma personalizado: escolha dias off semanais, alternados ou por intervalo de datas. Organize por Subject ou System, e reordene ou remova tópicos conforme sua necessidade. As aulas serão distribuídas uniformemente nos dias disponíveis.</p>
             </div>
            
             <div class="form-grid">
@@ -527,29 +683,298 @@
                 </div>
             </div>
             
-            <div class="days-off-container">
-                <div class="days-off-title">🚫 Days Off - Dias sem estudo</div>
-                <div class="weekday-selector">
-                    <input type="checkbox" id="day-0" class="weekday-checkbox" value="0">
-                    <label for="day-0" class="weekday-label">Domingo</label>
-                   
-                    <input type="checkbox" id="day-1" class="weekday-checkbox" value="1">
-                    <label for="day-1" class="weekday-label">Segunda</label>
-                   
-                    <input type="checkbox" id="day-2" class="weekday-checkbox" value="2">
-                    <label for="day-2" class="weekday-label">Terça</label>
-                   
-                    <input type="checkbox" id="day-3" class="weekday-checkbox" value="3">
-                    <label for="day-3" class="weekday-label">Quarta</label>
-                   
-                    <input type="checkbox" id="day-4" class="weekday-checkbox" value="4">
-                    <label for="day-4" class="weekday-label">Quinta</label>
-                   
-                    <input type="checkbox" id="day-5" class="weekday-checkbox" value="5">
-                    <label for="day-5" class="weekday-label">Sexta</label>
-                   
-                    <input type="checkbox" id="day-6" class="weekday-checkbox" value="6">
-                    <label for="day-6" class="weekday-label">Sábado</label>
+            <!-- DAYS OFF MASTER CONTAINER -->
+            <div class="days-off-master-container">
+                <div class="days-off-header">
+                    <h3>🚫 Configuração de Days Off</h3>
+                </div>
+                
+                <div class="days-off-tabs">
+                    <button class="days-off-tab active" onclick="switchDaysOffTab('weekly')">
+                        📅 Semanais
+                    </button>
+                    <button class="days-off-tab" onclick="switchDaysOffTab('alternating')">
+                        🔄 Alternados
+                    </button>
+                    <button class="days-off-tab" onclick="switchDaysOffTab('interval')">
+                        📆 Por Intervalo
+                    </button>
+                </div>
+                
+                <!-- TAB CONTENT: WEEKLY -->
+                <div id="weekly-tab" class="days-off-tab-content active">
+                    <div class="days-off-container">
+                        <div class="days-off-title">Dias fixos da semana sem estudo:</div>
+                        <div class="weekday-selector">
+                            <input type="checkbox" id="day-0" class="weekday-checkbox" value="0">
+                            <label for="day-0" class="weekday-label">Domingo</label>
+                           
+                            <input type="checkbox" id="day-1" class="weekday-checkbox" value="1">
+                            <label for="day-1" class="weekday-label">Segunda</label>
+                           
+                            <input type="checkbox" id="day-2" class="weekday-checkbox" value="2">
+                            <label for="day-2" class="weekday-label">Terça</label>
+                           
+                            <input type="checkbox" id="day-3" class="weekday-checkbox" value="3">
+                            <label for="day-3" class="weekday-label">Quarta</label>
+                           
+                            <input type="checkbox" id="day-4" class="weekday-checkbox" value="4">
+                            <label for="day-4" class="weekday-label">Quinta</label>
+                           
+                            <input type="checkbox" id="day-5" class="weekday-checkbox" value="5">
+                            <label for="day-5" class="weekday-label">Sexta</label>
+                           
+                            <input type="checkbox" id="day-6" class="weekday-checkbox" value="6">
+                            <label for="day-6" class="weekday-label">Sábado</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- TAB CONTENT: ALTERNATING -->
+                <div id="alternating-tab" class="days-off-tab-content">
+                    <div class="days-off-container">
+                        <div class="days-off-title">Configure dias que alternam (ex: a cada 2 domingos):</div>
+                        
+                        <div class="alternating-days-container">
+                            <!-- Domingo -->
+                            <div class="alternating-day-item" id="alt-day-0">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="alt-enable-0" onchange="toggleAlternatingDay(0)">
+                                    <label for="alt-enable-0" style="font-weight: 600; color: var(--dark);">
+                                        Domingo Alternado
+                                    </label>
+                                </div>
+                                <div class="alternating-controls" style="display: none;" id="alt-controls-0">
+                                    <div class="form-group">
+                                        <label>Frequência:</label>
+                                        <select id="alt-freq-0">
+                                            <option value="2">A cada 2 domingos</option>
+                                            <option value="3">A cada 3 domingos</option>
+                                            <option value="4">A cada 4 domingos</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>Começa:</label>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-0" value="this" checked>
+                                            <label>Este domingo</label>
+                                        </div>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-0" value="next">
+                                            <label>Próximo domingo</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Segunda -->
+                            <div class="alternating-day-item" id="alt-day-1">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="alt-enable-1" onchange="toggleAlternatingDay(1)">
+                                    <label for="alt-enable-1" style="font-weight: 600; color: var(--dark);">
+                                        Segunda Alternada
+                                    </label>
+                                </div>
+                                <div class="alternating-controls" style="display: none;" id="alt-controls-1">
+                                    <div class="form-group">
+                                        <label>Frequência:</label>
+                                        <select id="alt-freq-1">
+                                            <option value="2">A cada 2 segundas</option>
+                                            <option value="3">A cada 3 segundas</option>
+                                            <option value="4">A cada 4 segundas</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>Começa:</label>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-1" value="this" checked>
+                                            <label>Esta segunda</label>
+                                        </div>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-1" value="next">
+                                            <label>Próxima segunda</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Terça -->
+                            <div class="alternating-day-item" id="alt-day-2">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="alt-enable-2" onchange="toggleAlternatingDay(2)">
+                                    <label for="alt-enable-2" style="font-weight: 600; color: var(--dark);">
+                                        Terça Alternada
+                                    </label>
+                                </div>
+                                <div class="alternating-controls" style="display: none;" id="alt-controls-2">
+                                    <div class="form-group">
+                                        <label>Frequência:</label>
+                                        <select id="alt-freq-2">
+                                            <option value="2">A cada 2 terças</option>
+                                            <option value="3">A cada 3 terças</option>
+                                            <option value="4">A cada 4 terças</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>Começa:</label>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-2" value="this" checked>
+                                            <label>Esta terça</label>
+                                        </div>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-2" value="next">
+                                            <label>Próxima terça</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quarta -->
+                            <div class="alternating-day-item" id="alt-day-3">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="alt-enable-3" onchange="toggleAlternatingDay(3)">
+                                    <label for="alt-enable-3" style="font-weight: 600; color: var(--dark);">
+                                        Quarta Alternada
+                                    </label>
+                                </div>
+                                <div class="alternating-controls" style="display: none;" id="alt-controls-3">
+                                    <div class="form-group">
+                                        <label>Frequência:</label>
+                                        <select id="alt-freq-3">
+                                            <option value="2">A cada 2 quartas</option>
+                                            <option value="3">A cada 3 quartas</option>
+                                            <option value="4">A cada 4 quartas</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>Começa:</label>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-3" value="this" checked>
+                                            <label>Esta quarta</label>
+                                        </div>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-3" value="next">
+                                            <label>Próxima quarta</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quinta -->
+                            <div class="alternating-day-item" id="alt-day-4">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="alt-enable-4" onchange="toggleAlternatingDay(4)">
+                                    <label for="alt-enable-4" style="font-weight: 600; color: var(--dark);">
+                                        Quinta Alternada
+                                    </label>
+                                </div>
+                                <div class="alternating-controls" style="display: none;" id="alt-controls-4">
+                                    <div class="form-group">
+                                        <label>Frequência:</label>
+                                        <select id="alt-freq-4">
+                                            <option value="2">A cada 2 quintas</option>
+                                            <option value="3">A cada 3 quintas</option>
+                                            <option value="4">A cada 4 quintas</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>Começa:</label>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-4" value="this" checked>
+                                            <label>Esta quinta</label>
+                                        </div>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-4" value="next">
+                                            <label>Próxima quinta</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sexta -->
+                            <div class="alternating-day-item" id="alt-day-5">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="alt-enable-5" onchange="toggleAlternatingDay(5)">
+                                    <label for="alt-enable-5" style="font-weight: 600; color: var(--dark);">
+                                        Sexta Alternada
+                                    </label>
+                                </div>
+                                <div class="alternating-controls" style="display: none;" id="alt-controls-5">
+                                    <div class="form-group">
+                                        <label>Frequência:</label>
+                                        <select id="alt-freq-5">
+                                            <option value="2">A cada 2 sextas</option>
+                                            <option value="3">A cada 3 sextas</option>
+                                            <option value="4">A cada 4 sextas</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>Começa:</label>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-5" value="this" checked>
+                                            <label>Esta sexta</label>
+                                        </div>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-5" value="next">
+                                            <label>Próxima sexta</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sábado -->
+                            <div class="alternating-day-item" id="alt-day-6">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="alt-enable-6" onchange="toggleAlternatingDay(6)">
+                                    <label for="alt-enable-6" style="font-weight: 600; color: var(--dark);">
+                                        Sábado Alternado
+                                    </label>
+                                </div>
+                                <div class="alternating-controls" style="display: none;" id="alt-controls-6">
+                                    <div class="form-group">
+                                        <label>Frequência:</label>
+                                        <select id="alt-freq-6">
+                                            <option value="2">A cada 2 sábados</option>
+                                            <option value="3">A cada 3 sábados</option>
+                                            <option value="4">A cada 4 sábados</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>Começa:</label>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-6" value="this" checked>
+                                            <label>Este sábado</label>
+                                        </div>
+                                        <div class="alternating-option">
+                                            <input type="radio" name="alt-start-6" value="next">
+                                            <label>Próximo sábado</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- TAB CONTENT: INTERVAL -->
+                <div id="interval-tab" class="days-off-tab-content">
+                    <div class="days-off-container">
+                        <div class="days-off-title">Períodos específicos sem estudo (viagens, eventos, etc):</div>
+                        
+                        <div class="interval-list" id="intervalList">
+                            <!-- Intervals serão adicionados dinamicamente -->
+                        </div>
+                        
+                        <button class="btn-add" onclick="addInterval()">
+                            ➕ Adicionar Intervalo
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- SUMMARY BOX -->
+                <div class="summary-box" id="daysOffSummary" style="display: none;">
+                    <h4>📊 Resumo dos Days Off:</h4>
+                    <div class="summary-list" id="summaryContent"></div>
                 </div>
             </div>
             
@@ -604,27 +1029,23 @@
     </div>
     
     <script>
+
         // Ordem recomendada baseada nas imagens + sugestão do Léo
         const RECOMMENDED_SYSTEM_ORDER = [
-            // Bloco 1: Sistemas Vitais
             "Cardiovascular System",
             "Renal Urinary Systems and Electrolytes", 
             "Pulmonary and Critical Care",
-            // Bloco 2: Sistemas Metabólicos
             "Gastrointestinal and Nutrition",
             "Endocrine Diabetes Metabolism",
             "Female Reproductive System and Breast",
             "Male Reproductive System",
-            // Bloco 3: Neurológicos + Imuno ANTES MSK
             "Psychiatric Behavioral and Substance Abuse",
             "Nervous System",
-            "Immune System", // 🔥 ANTES de MSK - sugestão do Léo
+            "Immune System",
             "Rheumatology Musculoskeletal System",
-            // Bloco 4: Especialidades
             "Dermatology",
             "Miscellaneous Multisystem",
             "Hematology and Oncology",
-            // Bloco 5: Básicas
             "General Microbiology",
             "Multisystemic Infectious Diseases", 
             "General Biochemistry",
@@ -636,7 +1057,6 @@
         ];
 
         const RECOMMENDED_SUBJECT_ORDER = [
-            // Correspondem aproximadamente aos systems, mas por subjects
             "Cardiovascular System",
             "Renal Urinary Systems and Electrolytes",
             "Pulmonary and Critical Care", 
@@ -660,5656 +1080,2957 @@
             "General Anatomy & Physiology",
             "General Embryology"
         ];
+
 const courseData = {
-
   "lectures": [
-
     {
-
       "lecture": "Basic Pharmacology › General Topics: Enzymes",
-
       "duration": "14m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Basic Pharmacology › General Topics: Enzyme Inhibitors",
-
       "duration": "8m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Basic Pharmacology › General Topics: Dose-Response",
-
       "duration": "21m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Basic Pharmacology › General Topics: Drug Elimination",
-
       "duration": "17m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Basic Pharmacology › General Topics: Pharmacokinetics",
-
       "duration": "27m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Behavioral Science › General Topics: Ethics Principles",
-
       "duration": "12m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Behavioral Science › General Topics: Informed Consent",
-
       "duration": "18m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Behavioral Science › General Topics: Confidentiality",
-
       "duration": "11m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Behavioral Science › General Topics: Decision-Making Capacity",
-
       "duration": "8m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Behavioral Science › General Topics: Public Health",
-
       "duration": "10m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Behavioral Science › General Topics: Quality and Safety",
-
       "duration": "30m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Behavioral Science › General Topics: The Healthy Patient",
-
       "duration": "14m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Behavioral Science › General Topics: Geriatrics",
-
       "duration": "9m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Behavioral Science › General Topics: Pediatrics",
-
       "duration": "22m",
-
       "subject": "Social Sciences",
-
       "system": "Social Sciences"
-
     },
-
     {
-
       "lecture": "Biochemistry › Molecular Biochemistry: DNA Structure",
-
       "duration": "13m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Molecular Biochemistry: Purine Metabolism",
-
       "duration": "19m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Molecular Biochemistry: Pyrimidine Metabolism",
-
       "duration": "23m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: Glucose",
-
       "duration": "8m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: Glycolysis",
-
       "duration": "32m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: Gluconeogenesis",
-
       "duration": "18m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: Glycogen",
-
       "duration": "23m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: HMP Shunt",
-
       "duration": "15m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: Fructose and Galactose",
-
       "duration": "12m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: Pyruvate Dehydrogenase",
-
       "duration": "18m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: TCA Cycle",
-
       "duration": "14m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: Electron Transport Chain",
-
       "duration": "21m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: Fatty Acids",
-
       "duration": "27m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: Ketone Bodies",
-
       "duration": "9m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: Ethanol Metabolism",
-
       "duration": "19m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: Exercise and Starvation",
-
       "duration": "22m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Metabolism: Inborn Errors of Metabolism",
-
       "duration": "21m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Amino Acids: Amino Acids",
-
       "duration": "19m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Amino Acids: Phenylalanine and Tyrosine",
-
       "duration": "26m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Amino Acids: Other Amino Acids",
-
       "duration": "19m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Amino Acids: Ammonia",
-
       "duration": "18m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Vitamins: B Vitamins",
-
       "duration": "23m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Vitamins: B12 and Folate",
-
       "duration": "21m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Vitamins: Other Vitamins",
-
       "duration": "33m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Lipids: Lipid Metabolism",
-
       "duration": "20m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Lipids: Hyperlipidemia",
-
       "duration": "11m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Lipids: Lipid Drugs",
-
       "duration": "24m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biochemistry › Other Topics: Lysosomal Storage Diseases",
-
       "duration": "32m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Biostatistics › Biostatistics: Statistics",
-
       "duration": "18m",
-
       "subject": "Social Sciences",
-
       "system": "Social Sciences"
-
     },
-
     {
-
       "lecture": "Biostatistics › Biostatistics: Hypothesis Testing",
-
       "duration": "22m",
-
       "subject": "Social Sciences",
-
       "system": "Social Sciences"
-
     },
-
     {
-
       "lecture": "Biostatistics › Biostatistics: Tests of Significance",
-
       "duration": "15m",
-
       "subject": "Social Sciences",
-
       "system": "Social Sciences"
-
     },
-
     {
-
       "lecture": "Biostatistics › Biostatistics: Correlations",
-
       "duration": "8m",
-
       "subject": "Social Sciences",
-
       "system": "Social Sciences"
-
     },
-
     {
-
       "lecture": "Epidemiology › Epidemiology: Study Designs",
-
       "duration": "19m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Epidemiology › Epidemiology: Risk Quantification",
-
       "duration": "20m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Epidemiology › Epidemiology: Sensitivity and Specificity",
-
       "duration": "21m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Epidemiology › Epidemiology: Predictive Values",
-
       "duration": "13m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Epidemiology › Epidemiology: Diagnostic Tests",
-
       "duration": "17m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Epidemiology › Epidemiology: Bias",
-
       "duration": "23m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Epidemiology › Epidemiology: Clinical Trials",
-
       "duration": "32m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Epidemiology › Epidemiology: Evidence-Based Medicine",
-
       "duration": "10m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Cardiology › Anatomy and Physiology: Cardiac Anatomy",
-
       "duration": "9m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Anatomy and Physiology: Cardiac Physiology",
-
       "duration": "19m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Anatomy and Physiology: CV Response to Exercise",
-
       "duration": "9m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Anatomy and Physiology: Blood Flow Mechanics",
-
       "duration": "29m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Anatomy and Physiology: Regulation of Blood Pressure",
-
       "duration": "22m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Anatomy and Physiology: PV Loops",
-
       "duration": "17m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Anatomy and Physiology: Wiggers Diagram",
-
       "duration": "10m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Anatomy and Physiology: Venous Pressure Tracings",
-
       "duration": "9m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Anatomy and Physiology: Starling Curve",
-
       "duration": "17m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Cardiac Ischemia: Atherosclerosis",
-
       "duration": "17m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Cardiac Ischemia: Cardiac Ischemia",
-
       "duration": "31m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Cardiac Ischemia: STEMI",
-
       "duration": "13m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Cardiac Ischemia: Unstable Angina/NSTEMI",
-
       "duration": "8m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Cardiac Ischemia: Stable Angina",
-
       "duration": "21m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › EKGs: EKG Basics",
-
       "duration": "24m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › EKGs: High Yield EKGs",
-
       "duration": "18m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Arrhythmias: Cardiac Action Potentials",
-
       "duration": "16m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Arrhythmias: AV and Bundle Branch Blocks",
-
       "duration": "29m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Arrhythmias: Atrial Fibrillation and Flutter",
-
       "duration": "23m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Arrhythmias: AVNRT",
-
       "duration": "10m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Arrhythmias: WPW",
-
       "duration": "9m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Arrhythmias: Antiarrhythmic Drugs",
-
       "duration": "46m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Cardiac Auscultation: Heart Murmurs",
-
       "duration": "22m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Cardiac Auscultation: Heart Sounds",
-
       "duration": "18m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Heart Failure: Heart Failure Basics",
-
       "duration": "22m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Heart Failure: Systolic and Diastolic Heart Failure",
-
       "duration": "18m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Heart Failure: Restrictive Cardiomyopathy",
-
       "duration": "13m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Heart Failure: Acute Heart Failure",
-
       "duration": "21m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Heart Failure: Chronic Heart Failure",
-
       "duration": "18m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › The Developing Heart: Cardiac Embryology",
-
       "duration": "16m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › The Developing Heart: Shunts",
-
       "duration": "18m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › The Developing Heart: Cyanotic Congenital Heart Disease",
-
       "duration": "23m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › The Developing Heart: Coarctation of the Aorta",
-
       "duration": "12m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Hypertension: Hypertension",
-
       "duration": "13m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Hypertension: Secondary Hypertension",
-
       "duration": "20m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Hypertension: Hypertension Drugs",
-
       "duration": "32m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Other Cardiovascular Topics: Valve Disease",
-
       "duration": "26m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Other Cardiovascular Topics: Shock",
-
       "duration": "22m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Other Cardiovascular Topics: Pericardial Disease",
-
       "duration": "25m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Other Cardiovascular Topics: Aortic Dissection",
-
       "duration": "17m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Other Cardiovascular Topics: Cardiac Tumors",
-
       "duration": "6m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Other Cardiovascular Topics: Hypertrophic Cardiomyopathy",
-
       "duration": "18m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cardiology › Other Cardiovascular Topics: Endocarditis",
-
       "duration": "18m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Cell Biology › Molecular Biology: DNA Replication",
-
       "duration": "18m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Cell Biology › Molecular Biology: DNA Mutations",
-
       "duration": "15m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Cell Biology › Molecular Biology: DNA Repair",
-
       "duration": "18m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Cell Biology › Molecular Biology: Transcription",
-
       "duration": "24m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Cell Biology › Molecular Biology: Translation",
-
       "duration": "21m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Cell Biology › Laboratory Techniques: PCR",
-
       "duration": "5m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Cell Biology › Laboratory Techniques: Blotting",
-
       "duration": "9m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Cell Biology › Laboratory Techniques: Flow Cytomertry",
-
       "duration": "6m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Cell Biology › Laboratory Techniques: ELISA",
-
       "duration": "10m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Cell Biology › Laboratory Techniques: Microarrays and FISH",
-
       "duration": "6m",
-
       "subject": "General Biochemistry",
-
       "system": "General Biochemistry"
-
     },
-
     {
-
       "lecture": "Cell Biology › Cellular Biology: Cell Cycle",
-
       "duration": "17m",
-
       "subject": "General Cell Biology & Histology",
-
       "system": "General Cell Biology & Histology"
-
     },
-
     {
-
       "lecture": "Cell Biology › Cellular Biology: Cell Structure",
-
       "duration": "21m",
-
       "subject": "General Cell Biology & Histology",
-
       "system": "General Cell Biology & Histology"
-
     },
-
     {
-
       "lecture": "Cell Biology › Cellular Biology: Cytoskeleton",
-
       "duration": "16m",
-
       "subject": "General Cell Biology & Histology",
-
       "system": "General Cell Biology & Histology"
-
     },
-
     {
-
       "lecture": "Cell Biology › Cellular Biology: Connective Tissue",
-
       "duration": "25m",
-
       "subject": "General Cell Biology & Histology",
-
       "system": "General Cell Biology & Histology"
-
     },
-
     {
-
       "lecture": "Dermatology › Skin",
-
       "duration": "15m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Dermatology › Epithelial Cells",
-
       "duration": "13m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Dermatology › Skin Disorders I",
-
       "duration": "21m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Dermatology › Skin Disorders II",
-
       "duration": "12m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Dermatology › Pigment Disorders",
-
       "duration": "7m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Dermatology › Vascular Lesions",
-
       "duration": "12m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Dermatology › Skin Infections",
-
       "duration": "14m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Dermatology › Blistering Disorders",
-
       "duration": "11m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Dermatology › Hypersensitivity Disorders",
-
       "duration": "14m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Dermatology › Skin Cancer",
-
       "duration": "19m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Dermatology › Neurocutaneous Disorders",
-
       "duration": "22m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Endocrinology › Signalling Pathways",
-
       "duration": "20m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Parathyroid Glands",
-
       "duration": "16m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Parathyroid Pathology",
-
       "duration": "30m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › MEN Syndromes",
-
       "duration": "11m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Pituitary Anatomy and Physiology",
-
       "duration": "24m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Pituitary Pathology",
-
       "duration": "25m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Primary Amenorrhea",
-
       "duration": "27m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Secondary Amenorrhea",
-
       "duration": "29m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Female Reproductive Hormones",
-
       "duration": "17m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Contraceptives",
-
       "duration": "15m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Menstrual Cycle",
-
       "duration": "23m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Reproductive Hormones",
-
       "duration": "23m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Male Reproductive Hormones",
-
       "duration": "27m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Treatment of Diabetes Mellitus",
-
       "duration": "29m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Type I Diabetes",
-
       "duration": "24m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Type II Diabetes",
-
       "duration": "28m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Insulin",
-
       "duration": "24m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Insulin Medications",
-
       "duration": "16m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Glucagon & Hypoglycemia",
-
       "duration": "22m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Adrenal Insufficiency",
-
       "duration": "21m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Adrenal Tumors",
-
       "duration": "15m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Hyperaldosteronism",
-
       "duration": "20m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Congenital Adrenal Hyperplasia",
-
       "duration": "21m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Adrenal Glands",
-
       "duration": "26m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Cushing Syndrome",
-
       "duration": "25m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Hypothyroidism and Thyroiditis",
-
       "duration": "27m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Thyroid Cancer",
-
       "duration": "15m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Thyroid Anatomy & Physiology",
-
       "duration": "15m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Thyroid Hormone Synthesis & Labs",
-
       "duration": "25m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Endocrinology › Hyperthyroidism",
-
       "duration": "34m",
-
       "subject": "Endocrine Diabetes Metabolism",
-
       "system": "Endocrine Diabetes Metabolism"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Anatomy: Gastrointestinal Embryology",
-
       "duration": "28m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Anatomy: Gastrointestinal Anatomy",
-
       "duration": "11m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Anatomy: Gastrointestinal Blood Supply",
-
       "duration": "19m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Anatomy: Gastrointestinal Tract",
-
       "duration": "20m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Anatomy: Liver, Gallbladder, and Pancreas",
-
       "duration": "12m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Anatomy: Salivary Glands",
-
       "duration": "14m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Anatomy: Hernias",
-
       "duration": "19m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › GI Physiology: Bile",
-
       "duration": "19m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › GI Physiology: Bilirubin",
-
       "duration": "30m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › GI Physiology: Gastrointestinal Secretions",
-
       "duration": "13m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › GI Physiology: Gastrointestinal Hormones",
-
       "duration": "25m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › GI Physiology: Exocrine Pancreas",
-
       "duration": "15m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Esophageal Disorders",
-
       "duration": "24m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Liver Disease",
-
       "duration": "23m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Cirrhosis",
-
       "duration": "23m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Liver Tumors",
-
       "duration": "10m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Wilson's Disease and Hemochromatosis",
-
       "duration": "15m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Gallstones",
-
       "duration": "21m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Biliary Disorders",
-
       "duration": "14m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Gastric Disorders",
-
       "duration": "32m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Malabsorption",
-
       "duration": "28m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Acute Pancreatitis",
-
       "duration": "22m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Chronic Pancreatitis & Pancreatic Cancer",
-
       "duration": "11m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Intestinal Disorders",
-
       "duration": "23m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Inflammatory Bowel Disease",
-
       "duration": "20m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Colon Cancer",
-
       "duration": "25m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Carcinoid Tumors",
-
       "duration": "7m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Gastroenterology › Clinical Gastroenterology: Gastrointestinal Pharmacology",
-
       "duration": "23m",
-
       "subject": "Gastrointestinal and Nutrition",
-
       "system": "Gastrointestinal and Nutrition"
-
     },
-
     {
-
       "lecture": "Genetics › Genetic Concepts: Genetic Principles",
-
       "duration": "25m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Genetics › Genetic Concepts: Gene Mapping",
-
       "duration": "12m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Genetics › Genetic Concepts: Meiosis",
-
       "duration": "16m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Genetics › Genetic Concepts: Hardy-Weinberg Law",
-
       "duration": "12m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Genetics › Genetic Concepts: Pedigrees",
-
       "duration": "19m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Genetics › Genetic Concepts: Imprinting",
-
       "duration": "7m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Genetics › Genetic Disorders: Down Syndrome",
-
       "duration": "14m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Genetics › Genetic Disorders: Trisomy Disorders",
-
       "duration": "8m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Genetics › Genetic Disorders: Muscular Dystrophy",
-
       "duration": "10m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Genetics › Genetic Disorders: Trinucleotide Repeat Disorders",
-
       "duration": "11m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Genetics › Genetic Disorders: Deletion Syndromes",
-
       "duration": "6m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Genetics › Genetic Disorders: Turner and Klinefelter Syndromes",
-
       "duration": "14m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Hematology › Hemostasis: Coagulation",
-
       "duration": "30m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Hemostasis: Platelet Activation",
-
       "duration": "13m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Hemostasis: Hypercoagulable States",
-
       "duration": "20m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Hemostasis: Coagulopathies",
-
       "duration": "15m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Hemostasis: Platelet Disorders",
-
       "duration": "25m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Hemostasis: Antiplatelet Drugs",
-
       "duration": "13m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Hemostasis: Anticoagulants Drugs",
-
       "duration": "29m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Red Blood Cells: Hemolysis Basics",
-
       "duration": "19m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Red Blood Cells: Extrinsic Hemolysis",
-
       "duration": "16m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Red Blood Cells: Intrinsic Hemolysis",
-
       "duration": "23m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Red Blood Cells: Microcytic Anemias",
-
       "duration": "34m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Red Blood Cells: Thalassemias",
-
       "duration": "22m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Red Blood Cells: Sickle Cell Anemia",
-
       "duration": "23m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Red Blood Cells: Other Anemias",
-
       "duration": "16m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Red Blood Cells: Blood Groups",
-
       "duration": "18m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › White Blood Cells: Acute Leukemia",
-
       "duration": "19m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › White Blood Cells: Chronic Leukemia",
-
       "duration": "15m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › White Blood Cells: Hodgkin Lymhpoma",
-
       "duration": "10m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › White Blood Cells: Non-Hodgkin Lymphoma",
-
       "duration": "22m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › White Blood Cells: Plasma Cell Disorders",
-
       "duration": "14m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › White Blood Cells: Amyloidosis",
-
       "duration": "15m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › White Blood Cells: Myeloproliferative Disorders",
-
       "duration": "19m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Cancer Drugs: Antimetabolites",
-
       "duration": "18m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Cancer Drugs: Alkylating Agents",
-
       "duration": "11m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Cancer Drugs: Antitumor Antibiotics",
-
       "duration": "8m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Cancer Drugs: Microtubule Inhibitors",
-
       "duration": "8m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Cancer Drugs: DNA Drugs",
-
       "duration": "5m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Cancer Drugs: Other Cancer Drugs",
-
       "duration": "18m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Hematology › Other Topics: Porphyrias",
-
       "duration": "15m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Immunology › Basic Immunology: Innate Immunology",
-
       "duration": "36m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Basic Immunology: T-Cells",
-
       "duration": "30m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Basic Immunology: B-Cells",
-
       "duration": "31m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Basic Immunology: The Complement System",
-
       "duration": "21m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Basic Immunology: Lymph Nodes and Spleen",
-
       "duration": "17m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Clinical Immunology: Hypersensitivity",
-
       "duration": "22m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Clinical Immunology: Transplants",
-
       "duration": "16m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Clinical Immunology: Immune Deficiency Syndromes",
-
       "duration": "37m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Pharmacology: Glucocorticoids and NSAIDs",
-
       "duration": "16m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Pharmacology: Immunosuppressive Drugs",
-
       "duration": "20m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Autoimmune Disorders: Systemic Lupus Erythematosus",
-
       "duration": "16m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Autoimmune Disorders: Rheumatoid Arthritis",
-
       "duration": "17m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Autoimmune Disorders: Slceroderma",
-
       "duration": "11m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Autoimmune Disorders: Sjogren's Syndrome",
-
       "duration": "10m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Immunology › Autoimmune Disorders: Vasculitis",
-
       "duration": "25m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Basics of Microbiology: Bacteria",
-
       "duration": "23m",
-
       "subject": "General Microbiology",
-
       "system": "General Microbiology"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Basics of Microbiology: Shapes and Strains",
-
       "duration": "13m",
-
       "subject": "General Microbiology",
-
       "system": "General Microbiology"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Basics of Microbiology: Bacterial Culture",
-
       "duration": "16m",
-
       "subject": "General Microbiology",
-
       "system": "General Microbiology"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Basics of Microbiology: Special Growth Requirements",
-
       "duration": "10m",
-
       "subject": "General Microbiology",
-
       "system": "General Microbiology"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Basics of Microbiology: Virulence",
-
       "duration": "30m",
-
       "subject": "General Microbiology",
-
       "system": "General Microbiology"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Basics of Microbiology: Growth and Genetics",
-
       "duration": "16m",
-
       "subject": "General Microbiology",
-
       "system": "General Microbiology"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Basics of Microbiology: Bacterial Identification",
-
       "duration": "18m",
-
       "subject": "General Microbiology",
-
       "system": "General Microbiology"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Bacteria: Staphylococci",
-
       "duration": "19m",
-
       "subject": "General Microbiology",
-
       "system": "General Microbiology"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Bacteria: Streptococci",
-
       "duration": "22m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Bacteria: Other Gram Positives",
-
       "duration": "26m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Bacteria: Gram Negative Rods",
-
       "duration": "31m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Bacteria: Other Gram Negatives",
-
       "duration": "27m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Bacteria: Spirochetes",
-
       "duration": "16m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Bacteria: Zoonotic Infections",
-
       "duration": "17m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Bacteria: Mycobacteria",
-
       "duration": "12m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Antibiotics: Penicillins",
-
       "duration": "23m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Antibiotics: Beta Lactams",
-
       "duration": "18m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Antibiotics: Sulfonamides",
-
       "duration": "15m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Antibiotics: Protein Synthesis Inhibitors",
-
       "duration": "21m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Antibiotics: Other Antibiotics",
-
       "duration": "16m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Fungi: Fungal Pneumonias",
-
       "duration": "17m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Fungi: Fungal Skin Infections",
-
       "duration": "11m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Fungi: Opportunistic Fungal Infections",
-
       "duration": "25m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Fungi: Antifungal Drugs",
-
       "duration": "15m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Parasites and Helminths: Malaria",
-
       "duration": "15m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Parasites and Helminths: Protozoa",
-
       "duration": "29m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Parasites and Helminths: Helminths",
-
       "duration": "29m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Viruses: Virus Structure",
-
       "duration": "19m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Viruses: DNA Viruses",
-
       "duration": "19m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Viruses: Herpes Viruses",
-
       "duration": "24m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Viruses: RNA Viruses",
-
       "duration": "44m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Viruses: Viral Hepatitis",
-
       "duration": "26m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Viruses: HIV",
-
       "duration": "19m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Viruses: HIV Drugs",
-
       "duration": "17m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Infectious Disease › Viruses: Antiviral Drugs",
-
       "duration": "15m",
-
       "subject": "Multisystemic Infectious Diseases",
-
       "system": "Multisystemic Infectious Diseases"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Anatomy and Orthopedics: Knee",
-
       "duration": "19m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Anatomy and Orthopedics: Shoulder and Elbow",
-
       "duration": "15m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Anatomy and Orthopedics: Brachial Plexus",
-
       "duration": "17m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Anatomy and Orthopedics: Wrist",
-
       "duration": "13m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Anatomy and Orthopedics: Hand",
-
       "duration": "17m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Anatomy and Orthopedics: Lumbosacral Plexus",
-
       "duration": "20m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Anatomy and Orthopedics: Lumbar Radiculopathy",
-
       "duration": "16m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Anatomy and Orthopedics: Hip",
-
       "duration": "11m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Cell Biology: Skeletal Muscle",
-
       "duration": "20m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Cell Biology: Cardiac Muscle",
-
       "duration": "9m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Cell Biology: Smooth Muscle",
-
       "duration": "16m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Cell Biology: Bone",
-
       "duration": "22m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Pathology: Bone Disorders",
-
       "duration": "20m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Pathology: Osteoporosis",
-
       "duration": "14m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Pathology: Osteoporosis Drugs",
-
       "duration": "10m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Pathology: Bone Tumors",
-
       "duration": "25m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Pathology: Osteoarthritis",
-
       "duration": "15m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Pathology: Gout",
-
       "duration": "14m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Pathology: Gout Drugs",
-
       "duration": "9m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Pathology: CPPD",
-
       "duration": "7m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Pathology: Seronegative Spondyloarthritis",
-
       "duration": "16m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Pathology: Muscle Disorders",
-
       "duration": "13m",
-
       "subject": "Rheumatology Musculoskeletal System",
-
       "system": "Rheumatology Musculoskeletal System"
-
     },
-
     {
-
       "lecture": "Musculoskeletal › Pathology: Neuromuscular Disorders",
-
       "duration": "13m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Neurology › Intro to Neuro: Cells of the Nervous System",
-
       "duration": "15m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Intro to Neuro: Nerve Damage",
-
       "duration": "12m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Intro to Neuro: Blood Brain Barrier",
-
       "duration": "4m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Intro to Neuro: Neurotransmitters",
-
       "duration": "11m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Intro to Neuro: Dermatomes and Reflexes",
-
       "duration": "12m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Nervous System Structures: Cerebral Cortex",
-
       "duration": "13m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Nervous System Structures: Spinal Cord",
-
       "duration": "14m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Nervous System Structures: Spinal Cord Syndromes",
-
       "duration": "19m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Nervous System Structures: Brainstem",
-
       "duration": "26m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Nervous System Structures: Cranial Nerves",
-
       "duration": "20m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Nervous System Structures: Auditory System",
-
       "duration": "11m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Nervous System Structures: Vestibular System",
-
       "duration": "13m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Nervous System Structures: Thalamus, Hypothalamus, Limbic System",
-
       "duration": "18m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Nervous System Structures: Cerebellum",
-
       "duration": "19m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Nervous System Structures: Basal Ganglia",
-
       "duration": "11m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Nervous System Structures: Ventricles and Sinuses",
-
       "duration": "15m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Neurovascular Disorders: Cerebral and Lacunar Strokes",
-
       "duration": "20m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Neurovascular Disorders: Vertebrobasilar Stroke Syndromes",
-
       "duration": "13m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Neurovascular Disorders: CNS Aneurysms",
-
       "duration": "8m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Neurovascular Disorders: Intracranial Bleeding",
-
       "duration": "20m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Neurovascular Disorders: Management of TIA/Stroke",
-
       "duration": "7m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Autonomic Nervous System: Autonomic Nervous System",
-
       "duration": "39m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Autonomic Nervous System: ANS Drugs: Norepinephrine",
-
       "duration": "24m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Autonomic Nervous System: ANS Drugs: Acetylecholine",
-
       "duration": "26m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Autonomic Nervous System: Autonomic Receptors",
-
       "duration": "21m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › The Eye: The Pupil",
-
       "duration": "14m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › The Eye: The Lens",
-
       "duration": "14m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › The Eye: The Retina",
-
       "duration": "18m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › The Eye: Eye Movements",
-
       "duration": "10m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › The Eye: Visual Fields",
-
       "duration": "11m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › The Eye: Gaze Palsies",
-
       "duration": "12m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › The Eye: Structural Eye Disorders",
-
       "duration": "15m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › The Eye: Glaucoma",
-
       "duration": "13m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Anesthesia: General Anesthesia",
-
       "duration": "21m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Anesthesia: Local Anesthesia",
-
       "duration": "8m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Anesthesia: Neuromuscular Blockers",
-
       "duration": "10m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Other Neuro Topics: Meningitis",
-
       "duration": "20m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Other Neuro Topics: Seizures",
-
       "duration": "23m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Other Neuro Topics: Neuroembryology",
-
       "duration": "18m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Other Neuro Topics: Delirium and Dementia",
-
       "duration": "22m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Other Neuro Topics: Demyelinating Diseases",
-
       "duration": "14m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Other Neuro Topics: Headaches",
-
       "duration": "10m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Other Neuro Topics: Brain Tumors",
-
       "duration": "17m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Other Neuro Topics: Parkinson's, Huntington's, and Movement Disorders",
-
       "duration": "20m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Neurology › Other: HIV CNS Infections",
-
       "duration": "6m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Pathology › Cellular Adaptations",
-
       "duration": "18m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Pathology › Cell Injury",
-
       "duration": "11m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Pathology › Free Radicals",
-
       "duration": "19m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Pathology › Apoptosis",
-
       "duration": "16m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Pathology › Necrosis",
-
       "duration": "12m",
-
       "subject": "Miscellaneous Multisystem",
-
       "system": "Miscellaneous Multisystem"
-
     },
-
     {
-
       "lecture": "Pathology › Inflammation Principles",
-
       "duration": "26m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Pathology › Acute and Chronic Inflammation",
-
       "duration": "17m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Pathology › Granulomatous Inflammation",
-
       "duration": "9m",
-
       "subject": "Immune System",
-
       "system": "Immune System"
-
     },
-
     {
-
       "lecture": "Pathology › Wound Healing and Scar",
-
       "duration": "24m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Pathology › Pathologic Calcification",
-
       "duration": "9m",
-
       "subject": "Dermatology",
-
       "system": "Dermatology"
-
     },
-
     {
-
       "lecture": "Pathology › Neoplasia",
-
       "duration": "25m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Psychiatry › Psychology: Conditioning and Transference",
-
       "duration": "12m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Psychology: Ego Defenses",
-
       "duration": "12m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: Child Abuse and Neglect",
-
       "duration": "10m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: Childhood Disorders",
-
       "duration": "13m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: ADHD and Autism",
-
       "duration": "13m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: Cognitive Disorders",
-
       "duration": "13m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: Psychosis",
-
       "duration": "7m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: Psychotic Disorders",
-
       "duration": "14m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: Dissociative Disorders",
-
       "duration": "8m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: Somatic and Factitious Disorders",
-
       "duration": "9m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: Personality Disorders",
-
       "duration": "14m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: Mood Disorders",
-
       "duration": "22m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: Anxiety Disorders",
-
       "duration": "16m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: Eating Disorders",
-
       "duration": "12m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pathology: Sleep Disorders",
-
       "duration": "15m",
-
       "subject": "Nervous System",
-
       "system": "Nervous System"
-
     },
-
     {
-
       "lecture": "Psychiatry › Substance Use Disorders: Alcohol and CNS Depressants",
-
       "duration": "17m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Substance Use Disorders: Opioids",
-
       "duration": "14m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Substance Use Disorders: Stimulants",
-
       "duration": "14m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Substance Use Disorders: Other Drugs",
-
       "duration": "9m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pharmacology: Antidepressants",
-
       "duration": "20m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pharmacology: Lithium",
-
       "duration": "9m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Psychiatry › Pharmacology: Antipsychotics",
-
       "duration": "23m",
-
       "subject": "Psychiatric Behavioral and Substance Abuse",
-
       "system": "Psychiatric Behavioral and Substance Abuse"
-
     },
-
     {
-
       "lecture": "Pulmonary › Embryology, Anatomy and Physiology: Pulmonary Embryology",
-
       "duration": "14m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Embryology, Anatomy and Physiology: Pulmonary Anatomy",
-
       "duration": "27m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Embryology, Anatomy and Physiology: Pulmonary Physiology",
-
       "duration": "32m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Embryology, Anatomy and Physiology: Hemoglobin",
-
       "duration": "23m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Embryology, Anatomy and Physiology: Pulmonary Circulation",
-
       "duration": "24m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Embryology, Anatomy and Physiology: Ventilation and Perfusion",
-
       "duration": "30m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Embryology, Anatomy and Physiology: Hypoxia",
-
       "duration": "31m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Embryology, Anatomy and Physiology: Carbon Dioxide",
-
       "duration": "23m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Embryology, Anatomy and Physiology: Pulmonary Physical Exam",
-
       "duration": "11m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Obstructive & Restrictive Diseases: Pulmonary Function Tests",
-
       "duration": "21m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Obstructive & Restrictive Diseases: Obstructive Lung Disease",
-
       "duration": "27m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Obstructive & Restrictive Diseases: Restrictive Lung Disease",
-
       "duration": "15m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Obstructive & Restrictive Diseases: Treatment of COPD and Asthma",
-
       "duration": "17m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Other Pulmonary Topics: Pneumonia",
-
       "duration": "26m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Other Pulmonary Topics: Pleural Disease",
-
       "duration": "13m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Other Pulmonary Topics: Lung Cancer",
-
       "duration": "14m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Other Pulmonary Topics: Sleep Apnea",
-
       "duration": "7m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Other Pulmonary Topics: Cystic Fibrosis",
-
       "duration": "14m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Other Pulmonary Topics: Tuberculosis",
-
       "duration": "27m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Other Pulmonary Topics: Sarcoidosis",
-
       "duration": "9m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Other Pulmonary Topics: Pulmonary Embolism",
-
       "duration": "15m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Pulmonary › Other Pulmonary Topics: Chest x-rays",
-
       "duration": "8m",
-
       "subject": "Pulmonary and Critical Care",
-
       "system": "Pulmonary and Critical Care"
-
     },
-
     {
-
       "lecture": "Renal › Embryology, Anatomy and Physiology: Renal Embryology",
-
       "duration": "16m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Embryology, Anatomy and Physiology: Renal Anatomy",
-
       "duration": "5m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Embryology, Anatomy and Physiology: Renal Physiology I",
-
       "duration": "26m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Embryology, Anatomy and Physiology: Renal Physiology II",
-
       "duration": "32m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Embryology, Anatomy and Physiology: Nephron Physiology",
-
       "duration": "38m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Embryology, Anatomy and Physiology: Renal Endocrinology",
-
       "duration": "19m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Acid-Base: Acid Excretion",
-
       "duration": "9m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Acid-Base: Acid-Base Principles",
-
       "duration": "30m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Acid-Base: Respiratory Acid-Base Disorders",
-
       "duration": "11m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Acid-Base: Metabolic Alkalosis",
-
       "duration": "18m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Acid-Base: Renal Tubular Acidosis",
-
       "duration": "20m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Acid-Base: Metabolic Acidosis",
-
       "duration": "30m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Acid-Base: Acid Base Problems",
-
       "duration": "20m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Electrolytes: Electrolyte Disorders",
-
       "duration": "24m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Electrolytes: Sodium and Water Balance",
-
       "duration": "24m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Electrolytes: Sodium Disorders",
-
       "duration": "36m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Diseases of the Nephron: Glomerulonephritis Principles",
-
       "duration": "15m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Diseases of the Nephron: Nephritic Syndrome",
-
       "duration": "22m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Diseases of the Nephron: Nephrotic Syndrome",
-
       "duration": "18m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Diseases of the Nephron: MPGN",
-
       "duration": "7m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Diseases of the Nephron: Tubulointerstitial Disease",
-
       "duration": "25m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Diseases of the Nephron: Renal Failure",
-
       "duration": "22m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Other Renal Topics: Urinary Tract Infections",
-
       "duration": "9m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Other Renal Topics: Cystic Kidney Disease",
-
       "duration": "8m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Other Renal Topics: Diuretics",
-
       "duration": "22m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Other Renal Topics: Kidney Stones",
-
       "duration": "12m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Other Renal Topics: Renal and Bladder Tumors",
-
       "duration": "13m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Renal › Other Renal Topics: Rhabdomyolysis",
-
       "duration": "7m",
-
       "subject": "Renal Urinary Systems and Electrolytes",
-
       "system": "Renal Urinary Systems and Electrolytes"
-
     },
-
     {
-
       "lecture": "Reproductive › Embryology: Embryonic Genes",
-
       "duration": "12m",
-
       "subject": "General Genetics",
-
       "system": "General Genetics"
-
     },
-
     {
-
       "lecture": "Reproductive › Embryology: Embryogenesis",
-
       "duration": "8m",
-
       "subject": "General Anatomy & Physiology",
-
       "system": "General Anatomy & Physiology"
-
     },
-
     {
-
       "lecture": "Reproductive › Embryology: Germ Layers",
-
       "duration": "8m",
-
       "subject": "General Embryology",
-
       "system": "General Embryology"
-
     },
-
     {
-
       "lecture": "Reproductive › Embryology: Errors in Morphogenesis",
-
       "duration": "5m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Embryology: Teratogens I",
-
       "duration": "16m",
-
       "subject": "General Embryology",
-
       "system": "General Embryology"
-
     },
-
     {
-
       "lecture": "Reproductive › Embryology: Teratogens II",
-
       "duration": "12m",
-
       "subject": "General Embryology",
-
       "system": "General Embryology"
-
     },
-
     {
-
       "lecture": "Reproductive › Embryology: Pharyngeal Arches",
-
       "duration": "14m",
-
       "subject": "General Embryology",
-
       "system": "General Embryology"
-
     },
-
     {
-
       "lecture": "Reproductive › Embryology: Cleft Lip and Palate",
-
       "duration": "3m",
-
       "subject": "General Embryology",
-
       "system": "General Embryology"
-
     },
-
     {
-
       "lecture": "Reproductive › Embryology: Pharyngeal Pouches and Clefts",
-
       "duration": "8m",
-
       "subject": "General Anatomy & Physiology",
-
       "system": "General Anatomy & Physiology"
-
     },
-
     {
-
       "lecture": "Reproductive › Embryology: Genital Embryology",
-
       "duration": "17m",
-
       "subject": "General Embryology",
-
       "system": "General Embryology"
-
     },
-
     {
-
       "lecture": "Reproductive › Pregnancy: Spermatogenesis and Oogenesis",
-
       "duration": "13m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Pregnancy: Placenta",
-
       "duration": "13m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Pregnancy: Twins",
-
       "duration": "6m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Pregnancy: Pregnancy",
-
       "duration": "15m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Pregnancy: Maternal-Fetal Disorders",
-
       "duration": "17m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Pregnancy: Hypertension in Pregnancy",
-
       "duration": "12m",
-
       "subject": "Cardiovascular System",
-
       "system": "Cardiovascular System"
-
     },
-
     {
-
       "lecture": "Reproductive › Pregnancy: Placental Complications",
-
       "duration": "15m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Pregnancy: Gestational Tumors",
-
       "duration": "13m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Pregnancy: TORCH Infections",
-
       "duration": "14m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Vagina, Cervix, Uterus: Vaginal Cancer",
-
       "duration": "6m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Reproductive › Vagina, Cervix, Uterus: Cervical Cancer",
-
       "duration": "10m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Reproductive › Vagina, Cervix, Uterus: Endometrial Disorders",
-
       "duration": "12m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Vagina, Cervix, Uterus: Endometriosis",
-
       "duration": "11m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Vagina, Cervix, Uterus: Endometrial Cancer",
-
       "duration": "10m",
-
       "subject": "Hematology and Oncology",
-
       "system": "Hematology and Oncology"
-
     },
-
     {
-
       "lecture": "Reproductive › Ovary: Ovarian Cysts",
-
       "duration": "7m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Ovary: Ovarian Epithelial Tumors",
-
       "duration": "12m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Ovary: Ovarian Stromal Tumors",
-
       "duration": "7m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Ovary: Ovarian Germ Cell Tumors",
-
       "duration": "12m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Breast: Breast Tissue",
-
       "duration": "13m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Breast: Breast Disorders",
-
       "duration": "16m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Breast: Breast Carcinoma",
-
       "duration": "18m",
-
       "subject": "Female Reproductive System and Breast",
-
       "system": "Female Reproductive System and Breast"
-
     },
-
     {
-
       "lecture": "Reproductive › Male Disorders: Penile Disorders",
-
       "duration": "18m",
-
       "subject": "Male Reproductive System",
-
       "system": "Male Reproductive System"
-
     },
-
     {
-
       "lecture": "Reproductive › Male Disorders: Scrotal Disorders",
-
       "duration": "15m",
-
       "subject": "Male Reproductive System",
-
       "system": "Male Reproductive System"
-
     },
-
     {
-
       "lecture": "Reproductive › Male Disorders: Testicular Cancer",
-
       "duration": "15m",
-
       "subject": "Male Reproductive System",
-
       "system": "Male Reproductive System"
-
     },
-
     {
-
       "lecture": "Reproductive › Male Disorders: Prostate",
-
       "duration": "16m",
-
       "subject": "Male Reproductive System",
-
       "system": "Male Reproductive System"
-
     },
-
     {
-
       "lecture": "Reproductive › Other Topics: Disorders of Sexual Development",
-
       "duration": "25m",
-
       "subject": "Male Reproductive System",
-
       "system": "Male Reproductive System"
-
     },
-
     {
-
       "lecture": "Reproductive › Other Topics: Hypogonadism",
-
       "duration": "12m",
-
       "subject": "Male Reproductive System",
-
       "system": "Male Reproductive System"
-
     }
-
   ],
-
   "metadata": {
-
     "totalLectures": 459,
-
     "totalDuration": 8061,
-
     "subjects": [
-
       "Miscellaneous Multisystem",
-
       "Psychiatric Behavioral and Substance Abuse",
-
       "Social Sciences",
-
       "General Biochemistry",
-
       "Multisystemic Infectious Diseases",
-
       "Cardiovascular System",
-
       "General Cell Biology & Histology",
-
       "Dermatology",
-
       "Endocrine Diabetes Metabolism",
-
       "Gastrointestinal and Nutrition",
-
       "General Genetics",
-
       "Hematology and Oncology",
-
       "Immune System",
-
       "General Microbiology",
-
       "Pulmonary and Critical Care",
-
       "Rheumatology Musculoskeletal System",
-
       "Nervous System",
-
       "Renal Urinary Systems and Electrolytes",
-
       "General Anatomy & Physiology",
-
       "General Embryology",
-
       "Female Reproductive System and Breast",
-
       "Male Reproductive System"
-
     ],
-
     "systems": [
-
       "Miscellaneous Multisystem",
-
       "Psychiatric Behavioral and Substance Abuse",
-
       "Social Sciences",
-
       "General Biochemistry",
-
       "Multisystemic Infectious Diseases",
-
       "Cardiovascular System",
-
       "General Cell Biology & Histology",
-
       "Dermatology",
-
       "Endocrine Diabetes Metabolism",
-
       "Gastrointestinal and Nutrition",
-
       "General Genetics",
-
       "Hematology and Oncology",
-
       "Immune System",
-
       "General Microbiology",
-
       "Pulmonary and Critical Care",
-
       "Rheumatology Musculoskeletal System",
-
       "Nervous System",
-
       "Renal Urinary Systems and Electrolytes",
-
       "General Anatomy & Physiology",
-
       "General Embryology",
-
       "Female Reproductive System and Breast",
-
       "Male Reproductive System"
-
     ]
-
   }
-
 };
 
         let scheduleData = [];
         let organizationOrder = [];
         let removedItems = new Set();
+        let intervalCount = 0;
+        let alternatingDays = {};
+        let dateIntervals = [];
+
+        // FUNÇÕES DE DAYS OFF
+        function switchDaysOffTab(tab) {
+            // Remove active de todas as tabs
+            document.querySelectorAll('.days-off-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.days-off-tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Adiciona active na tab selecionada
+            event.target.classList.add('active');
+            document.getElementById(`${tab}-tab`).classList.add('active');
+            
+            updateDaysOffSummary();
+        }
+
+        function toggleAlternatingDay(dayNumber) {
+            const checkbox = document.getElementById(`alt-enable-${dayNumber}`);
+            const controls = document.getElementById(`alt-controls-${dayNumber}`);
+            const item = checkbox.closest('.alternating-day-item');
+            
+            if (checkbox.checked) {
+                controls.style.display = 'grid';
+                item.classList.add('active');
+                
+                // Salvar configuração
+                alternatingDays[dayNumber] = {
+                    frequency: document.getElementById(`alt-freq-${dayNumber}`).value,
+                    start: document.querySelector(`input[name="alt-start-${dayNumber}"]:checked`).value
+                };
+            } else {
+                controls.style.display = 'none';
+                item.classList.remove('active');
+                delete alternatingDays[dayNumber];
+            }
+            
+            updateDaysOffSummary();
+        }
+
+        function addInterval() {
+            intervalCount++;
+            const intervalList = document.getElementById('intervalList');
+            
+            const intervalItem = document.createElement('div');
+            intervalItem.className = 'interval-item';
+            intervalItem.id = `interval-${intervalCount}`;
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            intervalItem.innerHTML = `
+                <div class="form-group">
+                    <label>Data Início:</label>
+                    <input type="date" id="interval-start-${intervalCount}" value="${today}" onchange="updateDaysOffSummary()">
+                </div>
+                <div class="form-group">
+                    <label>Data Fim:</label>
+                    <input type="date" id="interval-end-${intervalCount}" value="${today}" onchange="updateDaysOffSummary()">
+                </div>
+                <button class="btn-remove" onclick="removeInterval(${intervalCount})">
+                    ✕ Remover
+                </button>
+            `;
+            
+            intervalList.appendChild(intervalItem);
+            updateDaysOffSummary();
+        }
+
+        function removeInterval(id) {
+            const interval = document.getElementById(`interval-${id}`);
+            if (interval) {
+                interval.remove();
+                updateDaysOffSummary();
+            }
+        }
+
+        function updateDaysOffSummary() {
+            const summaryBox = document.getElementById('daysOffSummary');
+            const summaryContent = document.getElementById('summaryContent');
+            let summary = [];
+            
+            // Days off semanais
+            const weeklyDays = [];
+            const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            document.querySelectorAll('.weekday-checkbox:checked').forEach(checkbox => {
+                weeklyDays.push(dayNames[parseInt(checkbox.value)]);
+            });
+            if (weeklyDays.length > 0) {
+                summary.push(`<strong>Semanais:</strong> ${weeklyDays.join(', ')}`);
+            }
+            
+            // Days off alternados
+            Object.keys(alternatingDays).forEach(day => {
+                const dayName = dayNames[parseInt(day)];
+                const config = alternatingDays[day];
+                const freq = document.getElementById(`alt-freq-${day}`).value;
+                const start = document.querySelector(`input[name="alt-start-${day}"]:checked`).value;
+                summary.push(`<strong>Alternado:</strong> A cada ${freq} ${dayName.toLowerCase()}s (começando ${start === 'this' ? 'esta' : 'próxima'} semana)`);
+            });
+            
+            // Intervalos
+            const intervals = document.querySelectorAll('[id^="interval-"][id$="-start"]');
+            intervals.forEach(startInput => {
+                const id = startInput.id.match(/interval-start-(\d+)/)[1];
+                const endInput = document.getElementById(`interval-end-${id}`);
+                if (startInput.value && endInput.value) {
+                    const start = new Date(startInput.value).toLocaleDateString('pt-BR');
+                    const end = new Date(endInput.value).toLocaleDateString('pt-BR');
+                    summary.push(`<strong>Intervalo:</strong> ${start} até ${end}`);
+                }
+            });
+            
+            if (summary.length > 0) {
+                summaryContent.innerHTML = summary.join('<br>');
+                summaryBox.style.display = 'block';
+            } else {
+                summaryBox.style.display = 'none';
+            }
+        }
 
         function initializeOrganizationList() {
             const orgType = document.querySelector('input[name="organization"]:checked').value;
-            console.log('Inicializando lista com tipo:', orgType);
-            
             const uniqueItems = [...new Set(courseData.lectures.map(l => l[orgType]))];
-            console.log('Items únicos encontrados:', uniqueItems.length, uniqueItems);
             
-            // Usar ordem recomendada como padrão
             const recommendedOrder = orgType === 'system' ? RECOMMENDED_SYSTEM_ORDER : RECOMMENDED_SUBJECT_ORDER;
-            console.log('Usando ordem recomendada para:', orgType, 'com', recommendedOrder.length, 'items');
             
-            // Ordenar baseado na ordem recomendada, colocando itens não encontrados no final
             organizationOrder = [];
             
-            // Primeiro, adicionar itens na ordem recomendada que existem nos dados
             recommendedOrder.forEach(item => {
                 if (uniqueItems.includes(item)) {
                     organizationOrder.push(item);
                 }
             });
             
-            // Depois, adicionar itens que não estão na ordem recomendada (ordem alfabética)
             const remainingItems = uniqueItems.filter(item => !recommendedOrder.includes(item)).sort();
             organizationOrder.push(...remainingItems);
-            
-            console.log('Ordem final:', organizationOrder);
             
             removedItems.clear();
             renderOrganizationList();
@@ -6423,7 +4144,7 @@ const courseData = {
         function updateOrganizationOrder() {
             const items = document.querySelectorAll('.sortable-item');
             organizationOrder = Array.from(items).map(item => item.dataset.item);
-            renderOrganizationList(); // Re-render para atualizar os números
+            renderOrganizationList();
         }
         
         function toggleItem(item) {
@@ -6450,10 +4171,24 @@ const courseData = {
                 return;
             }
             
-            // Obter dias off selecionados
-            const daysOff = [];
+            // Coletar todos os days off
+            const weeklyDaysOff = [];
             document.querySelectorAll('.weekday-checkbox:checked').forEach(checkbox => {
-                daysOff.push(parseInt(checkbox.value));
+                weeklyDaysOff.push(parseInt(checkbox.value));
+            });
+            
+            // Coletar intervalos de datas
+            const dateIntervals = [];
+            const intervals = document.querySelectorAll('[id^="interval-"][id$="-start"]');
+            intervals.forEach(startInput => {
+                const id = startInput.id.match(/interval-start-(\d+)/)[1];
+                const endInput = document.getElementById(`interval-end-${id}`);
+                if (startInput.value && endInput.value) {
+                    dateIntervals.push({
+                        start: new Date(startInput.value),
+                        end: new Date(endInput.value)
+                    });
+                }
             });
             
             document.querySelector('.loading').classList.add('active');
@@ -6462,12 +4197,64 @@ const courseData = {
                 // Calcular dias disponíveis para estudo
                 let studyDays = [];
                 let currentDate = new Date(startDate);
+                let weekCounts = {}; // Para contar ocorrências de cada dia da semana
+                
+                // Inicializar contador de ocorrências para cada dia
+                for (let i = 0; i < 7; i++) {
+                    weekCounts[i] = 0;
+                }
                 
                 while (currentDate <= endDate) {
                     const dayOfWeek = currentDate.getDay();
-                    if (!daysOff.includes(dayOfWeek)) {
+                    const dateString = currentDate.toDateString();
+                    let isDayOff = false;
+                    
+                    // Incrementar contador para este dia da semana
+                    weekCounts[dayOfWeek]++;
+                    
+                    // Verificar days off semanais
+                    if (weeklyDaysOff.includes(dayOfWeek)) {
+                        isDayOff = true;
+                    }
+                    
+                    // Verificar days off alternados
+                    if (!isDayOff && alternatingDays[dayOfWeek]) {
+                        const config = alternatingDays[dayOfWeek];
+                        const frequency = parseInt(document.getElementById(`alt-freq-${dayOfWeek}`).value);
+                        const startsThis = document.querySelector(`input[name="alt-start-${dayOfWeek}"]:checked`).value === 'this';
+                        
+                        // Calcular se este dia específico é day off
+                        const occurrence = weekCounts[dayOfWeek];
+                        
+                        // Se "começa esta semana", o primeiro dia é off, depois a cada N
+                        // Se "começa próxima semana", pula o primeiro e começa do segundo
+                        if (startsThis) {
+                            // Primeira ocorrência é off, depois a cada 'frequency' ocorrências
+                            if ((occurrence - 1) % frequency === 0) {
+                                isDayOff = true;
+                            }
+                        } else {
+                            // Segunda ocorrência é off, depois a cada 'frequency' ocorrências
+                            if (occurrence > 1 && (occurrence - 2) % frequency === 0) {
+                                isDayOff = true;
+                            }
+                        }
+                    }
+                    
+                    // Verificar intervalos de datas
+                    if (!isDayOff) {
+                        for (let interval of dateIntervals) {
+                            if (currentDate >= interval.start && currentDate <= interval.end) {
+                                isDayOff = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (!isDayOff) {
                         studyDays.push(new Date(currentDate));
                     }
+                    
                     currentDate.setDate(currentDate.getDate() + 1);
                 }
                 
@@ -6491,7 +4278,6 @@ const courseData = {
                     if (indexA !== indexB) {
                         return indexA - indexB;
                     }
-                    // Se for o mesmo subject/system, manter ordem original
                     return filteredLectures.indexOf(a) - filteredLectures.indexOf(b);
                 });
                 
@@ -6509,7 +4295,6 @@ const courseData = {
                     const date = studyDays[i];
                     const weekNumber = Math.floor((date - startDate) / (1000 * 60 * 60 * 24 * 7)) + 1;
                     
-                    // Determinar quantas aulas para este dia
                     const lecturesForToday = baseLecturesPerDay + (i < extraLectures ? 1 : 0);
                     
                     for (let j = 0; j < lecturesForToday && lectureIndex < totalLectures; j++) {
@@ -6530,7 +4315,7 @@ const courseData = {
                     }
                 }
                 
-                displayPreview(studyDays.length, daysOff.length, totalLectures);
+                displayPreview(studyDays.length, totalLectures);
                 document.getElementById('downloadBtn').disabled = false;
                 document.querySelector('.loading').classList.remove('active');
             }, 1000);
@@ -6548,13 +4333,13 @@ const courseData = {
             return `${day}/${month}/${year}`;
         }
         
-        function displayPreview(studyDaysCount, daysOffPerWeek, totalLectures) {
+        function displayPreview(studyDaysCount, totalLectures) {
             const previewContainer = document.getElementById('previewContainer');
             const statsGrid = document.getElementById('statsGrid');
             const previewTable = document.getElementById('previewTable');
             
-            // Exibir estatísticas
             const avgLecturesPerDay = (totalLectures / studyDaysCount).toFixed(1);
+            const totalWeeks = Math.ceil((new Date(document.getElementById('endDate').value) - new Date(document.getElementById('startDate').value)) / (1000 * 60 * 60 * 24 * 7));
             
             statsGrid.innerHTML = `
                 <div class="stat-card">
@@ -6570,12 +4355,11 @@ const courseData = {
                     <div class="stat-label">Média de Aulas/Dia</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">${7 - daysOffPerWeek}</div>
-                    <div class="stat-label">Dias/Semana</div>
+                    <div class="stat-value">${totalWeeks}</div>
+                    <div class="stat-label">Semanas Totais</div>
                 </div>
             `;
             
-            // Exibir tabela
             let html = '<table class="preview-table">';
             html += '<thead><tr>';
             html += '<th>Semana</th>';
@@ -6614,193 +4398,137 @@ const courseData = {
         }
         
         function downloadExcel() {
-    const studentName = document.getElementById('studentName').value;
-    const wb = XLSX.utils.book_new();
-    
-    // Adicionar cabeçalho com a marca
-    const headerData = [
-        ['WARD ACADEMY - De Old para Old'],
-        [`Cronograma USMLE Step 1 - ${studentName} (Ordem Recomendada)`],
-        [`@usmle.wardacademy`],
-        [], // Linha vazia
-        ['Semana', 'Data', 'Subject', 'System', 'Aulas', 'Duração', 'Concluído', 'Anotações']
-    ];
-    
-    // Preparar dados para Excel
-    const wsData = [...headerData];
-    
-    scheduleData.forEach(row => {
-        wsData.push([
-            row.week,
-            `${row.dayOfWeek}\n${row.date}`,
-            row.subject,
-            row.system,
-            row.lecture,
-            row.duration,
-            '',
-            ''
-        ]);
-    });
-    
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    
-    // Configurar mesclagem de células para o cabeçalho
-    ws['!merges'] = [
-        // Mesclar título principal
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
-        // Mesclar subtítulo
-        { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
-        // Mesclar data de geração
-        { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } }
-    ];
-    
-    // Mesclar células consecutivas com mesmo conteúdo
-    if (scheduleData.length > 0) {
-        // Mesclar SEMANAS iguais consecutivas (coluna 0)
-        let currentWeek = '';
-        let weekStartRow = 5; // Começa após o cabeçalho
-        
-        for (let i = 0; i <= scheduleData.length; i++) {
-            const rowData = i < scheduleData.length ? scheduleData[i] : null;
-            const excelRow = i + 5;
+            const studentName = document.getElementById('studentName').value;
+            const wb = XLSX.utils.book_new();
             
-            if (!rowData || rowData.week !== currentWeek) {
-                // Mesclar grupo anterior se tinha mais de uma linha
-                if (currentWeek !== '' && excelRow - 1 > weekStartRow) {
-                    ws['!merges'].push({
-                        s: { r: weekStartRow, c: 0 },
-                        e: { r: excelRow - 1, c: 0 }
-                    });
-                }
-                // Iniciar novo grupo
-                if (rowData) {
-                    currentWeek = rowData.week;
-                    weekStartRow = excelRow;
+            const headerData = [
+                ['Ward Academy - De Old para Old'],
+                [`Cronograma USMLE Step 1 - ${studentName}`],
+                [`@usmle.wardacademy`],
+                [],
+                ['Semana', 'Data', 'Subject', 'System', 'Aulas', 'Duração', 'Concluído', 'Anotações']
+            ];
+            
+            const wsData = [...headerData];
+            
+            scheduleData.forEach(row => {
+                wsData.push([
+                    row.week,
+                    `${row.dayOfWeek}\n${row.date}`,
+                    row.subject,
+                    row.system,
+                    row.lecture,
+                    row.duration,
+                    '',
+                    ''
+                ]);
+            });
+            
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            
+            // Inicializar array de merges com cabeçalho
+            ws['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } }
+            ];
+            
+            // Função auxiliar para adicionar merges
+            function addMerges(columnIndex, columnName) {
+                let currentValue = '';
+                let startRow = 5; // Começa após o cabeçalho
+                
+                for (let i = 0; i <= scheduleData.length; i++) {
+                    const rowData = i < scheduleData.length ? scheduleData[i] : null;
+                    const excelRow = i + 5;
+                    
+                    let cellValue = '';
+                    if (rowData) {
+                        if (columnIndex === 0) cellValue = rowData.week;
+                        else if (columnIndex === 1) cellValue = `${rowData.dayOfWeek}\n${rowData.date}`;
+                        else if (columnIndex === 2) cellValue = rowData.subject;
+                        else if (columnIndex === 3) cellValue = rowData.system;
+                        else if (columnIndex === 5) cellValue = rowData.duration;
+                    }
+                    
+                    // Se mudou o valor ou chegou ao fim
+                    if (!rowData || cellValue !== currentValue) {
+                        // Mesclar grupo anterior se tinha mais de uma linha
+                        if (currentValue !== '' && excelRow - 1 > startRow) {
+                            ws['!merges'].push({
+                                s: { r: startRow, c: columnIndex },
+                                e: { r: excelRow - 1, c: columnIndex }
+                            });
+                        }
+                        // Iniciar novo grupo
+                        if (rowData) {
+                            currentValue = cellValue;
+                            startRow = excelRow;
+                        }
+                    }
                 }
             }
-        }
-        
-        // Mesclar DATAS iguais consecutivas (coluna 1)
-        let currentDate = '';
-        let dateStartRow = 5;
-        
-        for (let i = 0; i <= scheduleData.length; i++) {
-            const rowData = i < scheduleData.length ? scheduleData[i] : null;
-            const excelRow = i + 5;
-            const dateString = rowData ? `${rowData.dayOfWeek}\n${rowData.date}` : null;
             
-            if (!rowData || dateString !== currentDate) {
-                if (currentDate !== '' && excelRow - 1 > dateStartRow) {
-                    ws['!merges'].push({
-                        s: { r: dateStartRow, c: 1 },
-                        e: { r: excelRow - 1, c: 1 }
-                    });
-                }
-                if (rowData) {
-                    currentDate = dateString;
-                    dateStartRow = excelRow;
+            // Aplicar merges para todas as colunas necessárias
+            if (scheduleData.length > 0) {
+                addMerges(0, 'week');        // Coluna Semana
+                addMerges(1, 'date');        // Coluna Data
+                addMerges(2, 'subject');     // Coluna Subject
+                addMerges(3, 'system');      // Coluna System
+                addMerges(5, 'duration');    // Coluna Duração (se consecutivas forem iguais)
+            }
+            
+            // Configurar largura das colunas
+            ws['!cols'] = [
+                { wch: 12 }, // Semana
+                { wch: 20 }, // Data
+                { wch: 35 }, // Subject
+                { wch: 35 }, // System
+                { wch: 60 }, // Aulas
+                { wch: 10 }, // Duração
+                { wch: 12 }, // Status
+                { wch: 30 }  // Anotações
+            ];
+            
+            // Aplicar estilos e cores alternadas por semana
+            const colors = ['E0F2FE', 'F0FDF4', 'FEF3C7', 'FCE7F3'];
+            
+            for (let i = 0; i < scheduleData.length; i++) {
+                const rowData = scheduleData[i];
+                const excelRow = i + 5;
+                const weekNum = rowData.weekNumber;
+                const colorIndex = ((weekNum - 1) % 4);
+                const bgColor = colors[colorIndex];
+                
+                for (let col = 0; col <= 7; col++) {
+                    const cellAddress = XLSX.utils.encode_cell({ r: excelRow, c: col });
+                    if (!ws[cellAddress]) ws[cellAddress] = { v: '' };
+                    
+                    ws[cellAddress].s = {
+                        fill: { fgColor: { rgb: bgColor } },
+                        alignment: {
+                            horizontal: col <= 3 ? 'center' : 'left',
+                            vertical: 'center',
+                            wrapText: true
+                        },
+                        border: {
+                            top: { style: 'thin', color: { rgb: 'CCCCCC' } },
+                            bottom: { style: 'thin', color: { rgb: 'CCCCCC' } },
+                            left: { style: 'thin', color: { rgb: 'CCCCCC' } },
+                            right: { style: 'thin', color: { rgb: 'CCCCCC' } }
+                        }
+                    };
                 }
             }
-        }
-        
-        // Mesclar SUBJECTS iguais consecutivos (coluna 2)
-        let currentSubject = '';
-        let subjectStartRow = 5;
-        
-        for (let i = 0; i <= scheduleData.length; i++) {
-            const rowData = i < scheduleData.length ? scheduleData[i] : null;
-            const excelRow = i + 5;
             
-            if (!rowData || rowData.subject !== currentSubject) {
-                if (currentSubject !== '' && excelRow - 1 > subjectStartRow) {
-                    ws['!merges'].push({
-                        s: { r: subjectStartRow, c: 2 },
-                        e: { r: excelRow - 1, c: 2 }
-                    });
-                }
-                if (rowData) {
-                    currentSubject = rowData.subject;
-                    subjectStartRow = excelRow;
-                }
-            }
-        }
-        
-        // Mesclar SYSTEMS iguais consecutivos (coluna 3)
-        let currentSystem = '';
-        let systemStartRow = 5;
-        
-        for (let i = 0; i <= scheduleData.length; i++) {
-            const rowData = i < scheduleData.length ? scheduleData[i] : null;
-            const excelRow = i + 5;
+            XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
             
-            if (!rowData || rowData.system !== currentSystem) {
-                if (currentSystem !== '' && excelRow - 1 > systemStartRow) {
-                    ws['!merges'].push({
-                        s: { r: systemStartRow, c: 3 },
-                        e: { r: excelRow - 1, c: 3 }
-                    });
-                }
-                if (rowData) {
-                    currentSystem = rowData.system;
-                    systemStartRow = excelRow;
-                }
-            }
+            const fileName = `Cronograma_${studentName.replace(/\s+/g, '_')}_USMLE_Step1.xlsx`;
+            XLSX.writeFile(wb, fileName);
         }
-    }
-    
-    // Configurar largura das colunas
-    ws['!cols'] = [
-        { wch: 12 }, // Semana
-        { wch: 20 }, // Data
-        { wch: 35 }, // Subject
-        { wch: 35 }, // System
-        { wch: 60 }, // Aulas
-        { wch: 10 }, // Duração
-        { wch: 12 }, // Status
-        { wch: 30 }  // Anotações
-    ];
-    
-    // Aplicar cores alternadas por semana nas linhas de dados
-    const colors = ['E0F2FE', 'F0FDF4', 'FEF3C7', 'FCE7F3'];
-    
-    for (let i = 0; i < scheduleData.length; i++) {
-        const rowData = scheduleData[i];
-        const excelRow = i + 5;
-        const weekNum = rowData.weekNumber;
-        const colorIndex = ((weekNum - 1) % 4);
-        const bgColor = colors[colorIndex];
         
-        for (let col = 0; col <= 7; col++) {
-            const cellAddress = XLSX.utils.encode_cell({ r: excelRow, c: col });
-            if (!ws[cellAddress]) ws[cellAddress] = { v: '' };
-            
-            ws[cellAddress].s = {
-                fill: { fgColor: { rgb: bgColor } },
-                alignment: {
-                    horizontal: col <= 3 ? 'center' : 'left',
-                    vertical: 'center',
-                    wrapText: true
-                },
-                border: {
-                    top: { style: 'thin', color: { rgb: 'CCCCCC' } },
-                    bottom: { style: 'thin', color: { rgb: 'CCCCCC' } },
-                    left: { style: 'thin', color: { rgb: 'CCCCCC' } },
-                    right: { style: 'thin', color: { rgb: 'CCCCCC' } }
-                }
-            };
-        }
-    }
-    
-    XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
-    
-    const fileName = `Cronograma_${studentName.replace(/\s+/g, '_')}_USMLE_Step1_Recomendado.xlsx`;
-    XLSX.writeFile(wb, fileName);
-}
-        
-        // Definir data padrão e inicializar
+        // Inicialização
         window.onload = function() {
-            console.log('Página carregada, inicializando...');
-            
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             const endDate = new Date(tomorrow);
@@ -6809,20 +4537,41 @@ const courseData = {
             document.getElementById('startDate').valueAsDate = tomorrow;
             document.getElementById('endDate').valueAsDate = endDate;
             
-            console.log('Total de lectures:', courseData.lectures.length);
-            
-            // Inicializar lista de organização com ordem recomendada
             initializeOrganizationList();
             
-            // Listener para mudança de organização
             document.querySelectorAll('input[name="organization"]').forEach(radio => {
                 radio.addEventListener('change', function() {
-                    console.log('Mudança de organização para:', this.value);
                     initializeOrganizationList();
                 });
             });
             
-            console.log('Inicialização completa');
+            // Listeners para atualizar configurações de dias alternados
+            for (let day = 0; day < 7; day++) {
+                const freqSelect = document.getElementById(`alt-freq-${day}`);
+                if (freqSelect) {
+                    freqSelect.addEventListener('change', () => {
+                        if (alternatingDays[day]) {
+                            alternatingDays[day].frequency = freqSelect.value;
+                            updateDaysOffSummary();
+                        }
+                    });
+                }
+                
+                const startRadios = document.querySelectorAll(`input[name="alt-start-${day}"]`);
+                startRadios.forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        if (alternatingDays[day]) {
+                            alternatingDays[day].start = radio.value;
+                            updateDaysOffSummary();
+                        }
+                    });
+                });
+            }
+            
+            // Listener para days off semanais
+            document.querySelectorAll('.weekday-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateDaysOffSummary);
+            });
         };
     </script>
 </body>
