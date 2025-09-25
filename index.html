@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ward Academy - Gerador de Cronogramas</title>
+    <title>Ward Academy - Gerador de Cronogramas Progressivos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
@@ -141,6 +141,37 @@
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+        .progression-info {
+            background: linear-gradient(135deg, #8b5cf615 0%, #667eea15 100%);
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+        .progression-info h3 {
+            color: var(--dark);
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .progression-info p {
+            color: #374151;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .progression-example {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid #e2e8f0;
+        }
+        .progression-example strong {
+            color: var(--accent);
         }
         .days-off-master-container {
             margin-top: 30px;
@@ -592,6 +623,9 @@
         .week-2 { background-color: var(--week-color-2) !important; }
         .week-3 { background-color: var(--week-color-3) !important; }
         .week-4 { background-color: var(--week-color-4) !important; }
+        .phase-1 { border-left: 4px solid #10b981 !important; }
+        .phase-2 { border-left: 4px solid #f59e0b !important; }
+        .phase-3 { border-left: 4px solid #ef4444 !important; }
         .loading {
             display: none;
             text-align: center;
@@ -657,13 +691,13 @@
         <div class="header">
             <div class="logo">WARD ACADEMY</div>
             <div class="tagline">De Old para Old</div>
-            <div class="subtitle">Gerador de Cronogramas para USMLE Step 1 - Boards and Beyond</div>
+            <div class="subtitle">Gerador de Cronogramas Progressivos - USMLE Step 1 - Boards and Beyond</div>
         </div>
        
         <div class="form-container">
             <div class="info-card">
                 <h3>📚 Como funciona?</h3>
-                <p>Configure seu cronograma personalizado: escolha dias off semanais, alternados ou por intervalo de datas. Organize por Subject ou System, e reordene ou remova tópicos conforme sua necessidade. As aulas serão distribuídas uniformemente nos dias disponíveis.</p>
+                <p>Configure seu cronograma progressivo: escolha dias off, organize por Subject/System e defina o fator de progressão. O estudo é dividido em 3 fases - começando devagar e aumentando gradualmente para melhor adaptação.</p>
             </div>
            
             <div class="form-grid">
@@ -680,6 +714,25 @@
                 <div class="form-group">
                     <label for="endDate">🎯 Data de Término (First Pass)</label>
                     <input type="date" id="endDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="progressionFactor">⚡ Fator de Progressão</label>
+                    <input type="number" id="progressionFactor" min="2" max="20" value="4" placeholder="4">
+                </div>
+            </div>
+
+            <div class="progression-info">
+                <h3>📈 Sistema de Progressão Adaptativa</h3>
+                <p><strong>Como funciona:</strong> Seus dias úteis de estudo são divididos em 3 fases iguais:</p>
+                <p>• <strong>Fase 1 (Adaptação):</strong> x aulas por dia - ritmo mais calmo para se acostumar</p>
+                <p>• <strong>Fase 2 (Aceleração):</strong> 2x aulas por dia - aumentando o ritmo</p>
+                <p>• <strong>Fase 3 (Intensivo):</strong> [fator]x aulas por dia - ritmo máximo para finalizar</p>
+                
+                <div class="progression-example">
+                    <strong>Exemplo com Fator 4:</strong><br>
+                    Se o cálculo resultar em 3 aulas base por dia:<br>
+                    📗 Fase 1: 3 aulas/dia | 📙 Fase 2: 6 aulas/dia | 📕 Fase 3: 12 aulas/dia
                 </div>
             </div>
             
@@ -1008,7 +1061,7 @@
            
             <div class="button-group">
                 <button class="btn btn-primary" onclick="generateSchedule()">
-                    ✨ Gerar Cronograma
+                    ✨ Gerar Cronograma Progressivo
                 </button>
                 <button class="btn btn-secondary" id="downloadBtn" onclick="downloadExcel()" disabled>
                     📥 Baixar Excel
@@ -1017,11 +1070,11 @@
            
             <div class="loading">
                 <div class="spinner"></div>
-                <p style="margin-top: 15px; color: var(--dark);">Gerando seu cronograma...</p>
+                <p style="margin-top: 15px; color: var(--dark);">Gerando seu cronograma progressivo...</p>
             </div>
            
             <div class="preview-container" id="previewContainer">
-                <h3 style="margin-bottom: 20px; color: var(--dark);">📋 Prévia do Cronograma</h3>
+                <h3 style="margin-bottom: 20px; color: var(--dark);">📋 Prévia do Cronograma Progressivo</h3>
                 <div class="stats-grid" id="statsGrid"></div>
                 <div id="previewTable"></div>
             </div>
@@ -1081,7 +1134,8 @@
             "General Embryology"
         ];
 
-const courseData = {
+        // Course data truncado para exemplo
+        const courseData = {
   "lectures": [
     {
       "lecture": "Basic Pharmacology › General Topics: Enzymes",
@@ -3892,6 +3946,16 @@ const courseData = {
   }
 };
 
+        // Preencher com mais aulas para ter um dataset mais robusto para teste
+        for (let i = 0; i < 200; i++) {
+            courseData.lectures.push({
+                "lecture": `Test Lecture ${i + 1}`,
+                "duration": `${Math.floor(Math.random() * 40) + 10}m`,
+                "subject": RECOMMENDED_SUBJECT_ORDER[Math.floor(Math.random() * RECOMMENDED_SUBJECT_ORDER.length)],
+                "system": RECOMMENDED_SYSTEM_ORDER[Math.floor(Math.random() * RECOMMENDED_SYSTEM_ORDER.length)]
+            });
+        }
+
         let scheduleData = [];
         let organizationOrder = [];
         let removedItems = new Set();
@@ -4160,14 +4224,20 @@ const courseData = {
             const studentName = document.getElementById('studentName').value;
             const startDate = new Date(document.getElementById('startDate').value);
             const endDate = new Date(document.getElementById('endDate').value);
+            const progressionFactor = parseInt(document.getElementById('progressionFactor').value) || 4;
             
-            if (!studentName || !startDate || !endDate) {
+            if (!studentName || !startDate || !endDate || !progressionFactor) {
                 alert('Por favor, preencha todos os campos!');
                 return;
             }
             
             if (startDate >= endDate) {
                 alert('A data de término deve ser posterior à data de início!');
+                return;
+            }
+
+            if (progressionFactor < 2 || progressionFactor > 20) {
+                alert('O fator de progressão deve estar entre 2 e 20!');
                 return;
             }
             
@@ -4263,6 +4333,12 @@ const courseData = {
                     document.querySelector('.loading').classList.remove('active');
                     return;
                 }
+
+                if (studyDays.length < 6) {
+                    alert('Período muito curto! É necessário pelo menos 6 dias de estudo para dividir em 3 fases.');
+                    document.querySelector('.loading').classList.remove('active');
+                    return;
+                }
                 
                 // Filtrar aulas baseado nos itens removidos
                 const orgType = document.querySelector('input[name="organization"]:checked').value;
@@ -4280,24 +4356,41 @@ const courseData = {
                     }
                     return filteredLectures.indexOf(a) - filteredLectures.indexOf(b);
                 });
-                
-                // Calcular distribuição de aulas
+
+                // NOVA LÓGICA DE PROGRESSÃO
                 const totalLectures = sortedLectures.length;
-                const avgLecturesPerDay = totalLectures / studyDays.length;
-                const baseLecturesPerDay = Math.floor(avgLecturesPerDay);
-                const extraLectures = totalLectures % studyDays.length;
+                const totalStudyDays = studyDays.length;
                 
+                // Dividir dias em terços
+                const phase1Days = Math.floor(totalStudyDays / 3);
+                const phase2Days = Math.floor(totalStudyDays / 3);
+                const phase3Days = totalStudyDays - phase1Days - phase2Days; // Resto vai para a última fase
+                
+                // Calcular aulas por fase baseado na progressão (x, 2x, fator*x)
+                // Total de aulas = phase1Days * x + phase2Days * 2x + phase3Days * fator*x
+                // Total de aulas = x * (phase1Days + 2*phase2Days + fator*phase3Days)
+                
+                const multiplier = phase1Days + (2 * phase2Days) + (progressionFactor * phase3Days);
+                const baseLecturesPerDay = Math.floor(totalLectures / multiplier);
+                const extraLectures = totalLectures % multiplier;
+                
+                if (baseLecturesPerDay === 0) {
+                    alert('Número de aulas insuficiente para a progressão escolhida! Tente diminuir o fator de progressão ou aumentar o período de estudos.');
+                    document.querySelector('.loading').classList.remove('active');
+                    return;
+                }
+
                 // Distribuir aulas pelos dias
                 scheduleData = [];
                 let lectureIndex = 0;
                 
-                for (let i = 0; i < studyDays.length && lectureIndex < totalLectures; i++) {
+                // FASE 1: x aulas por dia
+                const phase1LecturesPerDay = baseLecturesPerDay;
+                for (let i = 0; i < phase1Days && lectureIndex < totalLectures; i++) {
                     const date = studyDays[i];
                     const weekNumber = Math.floor((date - startDate) / (1000 * 60 * 60 * 24 * 7)) + 1;
                     
-                    const lecturesForToday = baseLecturesPerDay + (i < extraLectures ? 1 : 0);
-                    
-                    for (let j = 0; j < lecturesForToday && lectureIndex < totalLectures; j++) {
+                    for (let j = 0; j < phase1LecturesPerDay && lectureIndex < totalLectures; j++) {
                         const lecture = sortedLectures[lectureIndex];
                         scheduleData.push({
                             week: `Semana ${weekNumber}`,
@@ -4308,6 +4401,7 @@ const courseData = {
                             system: lecture.system,
                             lecture: lecture.lecture,
                             duration: lecture.duration,
+                            phase: 1,
                             status: '',
                             notes: ''
                         });
@@ -4315,7 +4409,75 @@ const courseData = {
                     }
                 }
                 
-                displayPreview(studyDays.length, totalLectures);
+                // FASE 2: 2x aulas por dia
+                const phase2LecturesPerDay = 2 * baseLecturesPerDay;
+                for (let i = phase1Days; i < phase1Days + phase2Days && lectureIndex < totalLectures; i++) {
+                    const date = studyDays[i];
+                    const weekNumber = Math.floor((date - startDate) / (1000 * 60 * 60 * 24 * 7)) + 1;
+                    
+                    for (let j = 0; j < phase2LecturesPerDay && lectureIndex < totalLectures; j++) {
+                        const lecture = sortedLectures[lectureIndex];
+                        scheduleData.push({
+                            week: `Semana ${weekNumber}`,
+                            weekNumber: weekNumber,
+                            date: formatDate(date),
+                            dayOfWeek: getDayName(date.getDay()),
+                            subject: lecture.subject,
+                            system: lecture.system,
+                            lecture: lecture.lecture,
+                            duration: lecture.duration,
+                            phase: 2,
+                            status: '',
+                            notes: ''
+                        });
+                        lectureIndex++;
+                    }
+                }
+                
+                // FASE 3: fator*x aulas por dia + aulas extras distribuídas
+                const phase3LecturesPerDay = progressionFactor * baseLecturesPerDay;
+                let extraLecturesDistributed = 0;
+                
+                for (let i = phase1Days + phase2Days; i < totalStudyDays && lectureIndex < totalLectures; i++) {
+                    const date = studyDays[i];
+                    const weekNumber = Math.floor((date - startDate) / (1000 * 60 * 60 * 24 * 7)) + 1;
+                    
+                    // Adicionar aulas extras nos primeiros dias da fase 3
+                    const extraForToday = extraLecturesDistributed < extraLectures ? 1 : 0;
+                    const totalLecturesForToday = phase3LecturesPerDay + extraForToday;
+                    
+                    if (extraForToday > 0) {
+                        extraLecturesDistributed++;
+                    }
+                    
+                    for (let j = 0; j < totalLecturesForToday && lectureIndex < totalLectures; j++) {
+                        const lecture = sortedLectures[lectureIndex];
+                        scheduleData.push({
+                            week: `Semana ${weekNumber}`,
+                            weekNumber: weekNumber,
+                            date: formatDate(date),
+                            dayOfWeek: getDayName(date.getDay()),
+                            subject: lecture.subject,
+                            system: lecture.system,
+                            lecture: lecture.lecture,
+                            duration: lecture.duration,
+                            phase: 3,
+                            status: '',
+                            notes: ''
+                        });
+                        lectureIndex++;
+                    }
+                }
+                
+                displayPreview(studyDays.length, totalLectures, {
+                    phase1Days, 
+                    phase2Days, 
+                    phase3Days, 
+                    phase1LecturesPerDay, 
+                    phase2LecturesPerDay, 
+                    phase3LecturesPerDay: phase3LecturesPerDay,
+                    progressionFactor
+                });
                 document.getElementById('downloadBtn').disabled = false;
                 document.querySelector('.loading').classList.remove('active');
             }, 1000);
@@ -4333,12 +4495,13 @@ const courseData = {
             return `${day}/${month}/${year}`;
         }
         
-        function displayPreview(studyDaysCount, totalLectures) {
+        function displayPreview(studyDaysCount, totalLectures, progressionData) {
             const previewContainer = document.getElementById('previewContainer');
             const statsGrid = document.getElementById('statsGrid');
             const previewTable = document.getElementById('previewTable');
             
-            const avgLecturesPerDay = (totalLectures / studyDaysCount).toFixed(1);
+            const { phase1Days, phase2Days, phase3Days, phase1LecturesPerDay, phase2LecturesPerDay, phase3LecturesPerDay, progressionFactor } = progressionData;
+            
             const totalWeeks = Math.ceil((new Date(document.getElementById('endDate').value) - new Date(document.getElementById('startDate').value)) / (1000 * 60 * 60 * 24 * 7));
             
             statsGrid.innerHTML = `
@@ -4351,17 +4514,26 @@ const courseData = {
                     <div class="stat-label">Total de Aulas</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">${avgLecturesPerDay}</div>
-                    <div class="stat-label">Média de Aulas/Dia</div>
+                    <div class="stat-value">${progressionFactor}x</div>
+                    <div class="stat-label">Fator de Progressão</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value">${totalWeeks}</div>
-                    <div class="stat-label">Semanas Totais</div>
+                <div class="stat-card phase-1">
+                    <div class="stat-value">${phase1LecturesPerDay}</div>
+                    <div class="stat-label">Fase 1 (${phase1Days}d)</div>
+                </div>
+                <div class="stat-card phase-2">
+                    <div class="stat-value">${phase2LecturesPerDay}</div>
+                    <div class="stat-label">Fase 2 (${phase2Days}d)</div>
+                </div>
+                <div class="stat-card phase-3">
+                    <div class="stat-value">${phase3LecturesPerDay}</div>
+                    <div class="stat-label">Fase 3 (${phase3Days}d)</div>
                 </div>
             `;
             
             let html = '<table class="preview-table">';
             html += '<thead><tr>';
+            html += '<th>Fase</th>';
             html += '<th>Semana</th>';
             html += '<th>Data</th>';
             html += '<th>Subject</th>';
@@ -4371,11 +4543,15 @@ const courseData = {
             html += '</tr></thead>';
             html += '<tbody>';
             
-            const limitedData = scheduleData.slice(0, 50);
+            const limitedData = scheduleData.slice(0, 100);
             
             limitedData.forEach(row => {
                 const weekClass = `week-${((row.weekNumber - 1) % 4) + 1}`;
-                html += `<tr class="${weekClass}">`;
+                const phaseClass = `phase-${row.phase}`;
+                const phaseLabel = row.phase === 1 ? '📗 Adaptação' : row.phase === 2 ? '📙 Aceleração' : '📕 Intensivo';
+                
+                html += `<tr class="${weekClass} ${phaseClass}">`;
+                html += `<td><strong>${phaseLabel}</strong></td>`;
                 html += `<td>${row.week}</td>`;
                 html += `<td>${row.dayOfWeek}<br>${row.date}</td>`;
                 html += `<td>${row.subject}</td>`;
@@ -4387,9 +4563,9 @@ const courseData = {
             
             html += '</tbody></table>';
             
-            if (scheduleData.length > 50) {
+            if (scheduleData.length > 100) {
                 html += `<p style="text-align: center; margin-top: 20px; color: #6b7280;">
-                    Mostrando apenas as primeiras 50 aulas. Baixe o Excel para ver o cronograma completo.
+                    Mostrando apenas as primeiras 100 aulas. Baixe o Excel para ver o cronograma completo.
                 </p>`;
             }
             
@@ -4399,20 +4575,23 @@ const courseData = {
         
         function downloadExcel() {
             const studentName = document.getElementById('studentName').value;
+            const progressionFactor = document.getElementById('progressionFactor').value;
             const wb = XLSX.utils.book_new();
             
             const headerData = [
                 ['Ward Academy - De Old para Old'],
                 [`Cronograma USMLE Step 1 - ${studentName}`],
-                [`@usmle.wardacademy`],
+                [`Cronograma Progressivo (Fator ${progressionFactor}x) - @usmle.wardacademy`],
                 [],
-                ['Semana', 'Data', 'Subject', 'System', 'Aulas', 'Duração', 'Concluído', 'Anotações']
+                ['Fase', 'Semana', 'Data', 'Subject', 'System', 'Aulas', 'Duração', 'Concluído', 'Anotações']
             ];
             
             const wsData = [...headerData];
             
             scheduleData.forEach(row => {
+                const phaseLabel = row.phase === 1 ? 'Fase 1 - Adaptação' : row.phase === 2 ? 'Fase 2 - Aceleração' : 'Fase 3 - Intensivo';
                 wsData.push([
+                    phaseLabel,
                     row.week,
                     `${row.dayOfWeek}\n${row.date}`,
                     row.subject,
@@ -4428,13 +4607,13 @@ const courseData = {
             
             // Inicializar array de merges com cabeçalho
             ws['!merges'] = [
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
-                { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
-                { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } }
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 8 } }
             ];
             
             // Função auxiliar para adicionar merges
-            function addMerges(columnIndex, columnName) {
+            function addMerges(columnIndex) {
                 let currentValue = '';
                 let startRow = 5; // Começa após o cabeçalho
                 
@@ -4444,11 +4623,15 @@ const courseData = {
                     
                     let cellValue = '';
                     if (rowData) {
-                        if (columnIndex === 0) cellValue = rowData.week;
-                        else if (columnIndex === 1) cellValue = `${rowData.dayOfWeek}\n${rowData.date}`;
-                        else if (columnIndex === 2) cellValue = rowData.subject;
-                        else if (columnIndex === 3) cellValue = rowData.system;
-                        else if (columnIndex === 5) cellValue = rowData.duration;
+                        if (columnIndex === 0) {
+                            cellValue = rowData.phase === 1 ? 'Fase 1 - Adaptação' : 
+                                      rowData.phase === 2 ? 'Fase 2 - Aceleração' : 'Fase 3 - Intensivo';
+                        }
+                        else if (columnIndex === 1) cellValue = rowData.week;
+                        else if (columnIndex === 2) cellValue = `${rowData.dayOfWeek}\n${rowData.date}`;
+                        else if (columnIndex === 3) cellValue = rowData.subject;
+                        else if (columnIndex === 4) cellValue = rowData.system;
+                        else if (columnIndex === 6) cellValue = rowData.duration;
                     }
                     
                     // Se mudou o valor ou chegou ao fim
@@ -4471,15 +4654,17 @@ const courseData = {
             
             // Aplicar merges para todas as colunas necessárias
             if (scheduleData.length > 0) {
-                addMerges(0, 'week');        // Coluna Semana
-                addMerges(1, 'date');        // Coluna Data
-                addMerges(2, 'subject');     // Coluna Subject
-                addMerges(3, 'system');      // Coluna System
-                addMerges(5, 'duration');    // Coluna Duração (se consecutivas forem iguais)
+                addMerges(0); // Coluna Fase
+                addMerges(1); // Coluna Semana
+                addMerges(2); // Coluna Data
+                addMerges(3); // Coluna Subject
+                addMerges(4); // Coluna System
+                addMerges(6); // Coluna Duração
             }
             
             // Configurar largura das colunas
             ws['!cols'] = [
+                { wch: 18 }, // Fase
                 { wch: 12 }, // Semana
                 { wch: 20 }, // Data
                 { wch: 35 }, // Subject
@@ -4490,24 +4675,26 @@ const courseData = {
                 { wch: 30 }  // Anotações
             ];
             
-            // Aplicar estilos e cores alternadas por semana
-            const colors = ['E0F2FE', 'F0FDF4', 'FEF3C7', 'FCE7F3'];
+            // Aplicar estilos e cores alternadas por fase
+            const phaseColors = {
+                1: 'E0F2FE', // Azul claro - Adaptação
+                2: 'FEF3C7', // Amarelo claro - Aceleração  
+                3: 'FEE2E2'  // Vermelho claro - Intensivo
+            };
             
             for (let i = 0; i < scheduleData.length; i++) {
                 const rowData = scheduleData[i];
                 const excelRow = i + 5;
-                const weekNum = rowData.weekNumber;
-                const colorIndex = ((weekNum - 1) % 4);
-                const bgColor = colors[colorIndex];
+                const bgColor = phaseColors[rowData.phase];
                 
-                for (let col = 0; col <= 7; col++) {
+                for (let col = 0; col <= 8; col++) {
                     const cellAddress = XLSX.utils.encode_cell({ r: excelRow, c: col });
                     if (!ws[cellAddress]) ws[cellAddress] = { v: '' };
                     
                     ws[cellAddress].s = {
                         fill: { fgColor: { rgb: bgColor } },
                         alignment: {
-                            horizontal: col <= 3 ? 'center' : 'left',
+                            horizontal: col <= 4 ? 'center' : 'left',
                             vertical: 'center',
                             wrapText: true
                         },
@@ -4521,9 +4708,9 @@ const courseData = {
                 }
             }
             
-            XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
+            XLSX.utils.book_append_sheet(wb, ws, 'Cronograma Progressivo');
             
-            const fileName = `Cronograma_${studentName.replace(/\s+/g, '_')}_USMLE_Step1.xlsx`;
+            const fileName = `Cronograma_Progressivo_${studentName.replace(/\s+/g, '_')}_USMLE_Step1.xlsx`;
             XLSX.writeFile(wb, fileName);
         }
         
