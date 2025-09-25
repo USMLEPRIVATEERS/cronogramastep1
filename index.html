@@ -3946,7 +3946,6 @@
   }
 };
 
-        // Preencher com mais aulas para ter um dataset mais robusto para teste
         for (let i = 0; i < 200; i++) {
             courseData.lectures.push({
                 "lecture": `Test Lecture ${i + 1}`,
@@ -4357,7 +4356,7 @@
                     return filteredLectures.indexOf(a) - filteredLectures.indexOf(b);
                 });
 
-                // NOVA LÓGICA DE PROGRESSÃO
+                // NOVA LÓGICA DE PROGRESSÃO COM REPETIÇÃO DE AULAS
                 const totalLectures = sortedLectures.length;
                 const totalStudyDays = studyDays.length;
                 
@@ -4366,31 +4365,35 @@
                 const phase2Days = Math.floor(totalStudyDays / 3);
                 const phase3Days = totalStudyDays - phase1Days - phase2Days; // Resto vai para a última fase
                 
-                // Calcular aulas por fase baseado na progressão (x, 2x, fator*x)
-                // Total de aulas = phase1Days * x + phase2Days * 2x + phase3Days * fator*x
-                // Total de aulas = x * (phase1Days + 2*phase2Days + fator*phase3Days)
+                // Definir número mínimo de aulas por dia na Fase 1
+                // Se há muitas aulas, começamos com mais; se há poucas, começamos com 1
+                let baseLecturesPerDay;
                 
-                const multiplier = phase1Days + (2 * phase2Days) + (progressionFactor * phase3Days);
-                const baseLecturesPerDay = Math.floor(totalLectures / multiplier);
-                const extraLectures = totalLectures % multiplier;
-                
-                if (baseLecturesPerDay === 0) {
-                    alert('Número de aulas insuficiente para a progressão escolhida! Tente diminuir o fator de progressão ou aumentar o período de estudos.');
-                    document.querySelector('.loading').classList.remove('active');
-                    return;
+                if (totalLectures >= totalStudyDays) {
+                    // Caso normal: há aulas suficientes para distribuir
+                    const multiplier = phase1Days + (2 * phase2Days) + (progressionFactor * phase3Days);
+                    baseLecturesPerDay = Math.max(1, Math.floor(totalLectures / multiplier));
+                } else {
+                    // Caso especial: poucas aulas, começar com 1 aula por dia na Fase 1
+                    baseLecturesPerDay = 1;
                 }
 
-                // Distribuir aulas pelos dias
+                // Distribuir aulas pelos dias (permitindo repetição quando necessário)
                 scheduleData = [];
                 let lectureIndex = 0;
                 
                 // FASE 1: x aulas por dia
                 const phase1LecturesPerDay = baseLecturesPerDay;
-                for (let i = 0; i < phase1Days && lectureIndex < totalLectures; i++) {
+                for (let i = 0; i < phase1Days; i++) {
                     const date = studyDays[i];
                     const weekNumber = Math.floor((date - startDate) / (1000 * 60 * 60 * 24 * 7)) + 1;
                     
-                    for (let j = 0; j < phase1LecturesPerDay && lectureIndex < totalLectures; j++) {
+                    for (let j = 0; j < phase1LecturesPerDay; j++) {
+                        // Se chegou ao fim das aulas, reinicia do começo (permite repetição)
+                        if (lectureIndex >= totalLectures) {
+                            lectureIndex = 0;
+                        }
+                        
                         const lecture = sortedLectures[lectureIndex];
                         scheduleData.push({
                             week: `Semana ${weekNumber}`,
@@ -4411,11 +4414,16 @@
                 
                 // FASE 2: 2x aulas por dia
                 const phase2LecturesPerDay = 2 * baseLecturesPerDay;
-                for (let i = phase1Days; i < phase1Days + phase2Days && lectureIndex < totalLectures; i++) {
+                for (let i = phase1Days; i < phase1Days + phase2Days; i++) {
                     const date = studyDays[i];
                     const weekNumber = Math.floor((date - startDate) / (1000 * 60 * 60 * 24 * 7)) + 1;
                     
-                    for (let j = 0; j < phase2LecturesPerDay && lectureIndex < totalLectures; j++) {
+                    for (let j = 0; j < phase2LecturesPerDay; j++) {
+                        // Se chegou ao fim das aulas, reinicia do começo (permite repetição)
+                        if (lectureIndex >= totalLectures) {
+                            lectureIndex = 0;
+                        }
+                        
                         const lecture = sortedLectures[lectureIndex];
                         scheduleData.push({
                             week: `Semana ${weekNumber}`,
@@ -4434,23 +4442,19 @@
                     }
                 }
                 
-                // FASE 3: fator*x aulas por dia + aulas extras distribuídas
+                // FASE 3: fator*x aulas por dia
                 const phase3LecturesPerDay = progressionFactor * baseLecturesPerDay;
-                let extraLecturesDistributed = 0;
                 
-                for (let i = phase1Days + phase2Days; i < totalStudyDays && lectureIndex < totalLectures; i++) {
+                for (let i = phase1Days + phase2Days; i < totalStudyDays; i++) {
                     const date = studyDays[i];
                     const weekNumber = Math.floor((date - startDate) / (1000 * 60 * 60 * 24 * 7)) + 1;
                     
-                    // Adicionar aulas extras nos primeiros dias da fase 3
-                    const extraForToday = extraLecturesDistributed < extraLectures ? 1 : 0;
-                    const totalLecturesForToday = phase3LecturesPerDay + extraForToday;
-                    
-                    if (extraForToday > 0) {
-                        extraLecturesDistributed++;
-                    }
-                    
-                    for (let j = 0; j < totalLecturesForToday && lectureIndex < totalLectures; j++) {
+                    for (let j = 0; j < phase3LecturesPerDay; j++) {
+                        // Se chegou ao fim das aulas, reinicia do começo (permite repetição)
+                        if (lectureIndex >= totalLectures) {
+                            lectureIndex = 0;
+                        }
+                        
                         const lecture = sortedLectures[lectureIndex];
                         scheduleData.push({
                             week: `Semana ${weekNumber}`,
