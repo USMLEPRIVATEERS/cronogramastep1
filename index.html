@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ward Academy - Gerador de Cronogramas Progressivos</title>
+    <title>Ward Academy - Gerador de Cronogramas</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
@@ -141,37 +141,6 @@
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-        }
-        .progression-info {
-            background: linear-gradient(135deg, #8b5cf615 0%, #667eea15 100%);
-            border-left: 4px solid var(--accent);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
-        .progression-info h3 {
-            color: var(--dark);
-            margin-bottom: 12px;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .progression-info p {
-            color: #374151;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 10px;
-        }
-        .progression-example {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border: 1px solid #e2e8f0;
-        }
-        .progression-example strong {
-            color: var(--accent);
         }
         .days-off-master-container {
             margin-top: 30px;
@@ -374,52 +343,6 @@
             width: 18px;
             height: 18px;
         }
-        .recommended-order-info {
-            background: linear-gradient(135deg, #10b98120 0%, #059f0f20 100%);
-            border-left: 4px solid var(--secondary);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
-        .recommended-order-info h3 {
-            color: var(--dark);
-            margin-bottom: 12px;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .recommended-order-info p {
-            color: #374151;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 10px;
-        }
-        .immuno-highlight {
-            background: #fef3c7;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 4px solid var(--warning);
-        }
-        .immuno-highlight strong {
-            color: var(--warning);
-        }
-        .reset-order-btn {
-            background: var(--secondary);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            margin-left: 15px;
-            transition: all 0.3s ease;
-        }
-        .reset-order-btn:hover {
-            background: #059669;
-            transform: translateY(-1px);
-        }
         .sortable-list {
             list-style: none;
             padding: 0;
@@ -441,14 +364,6 @@
             align-items: center;
             transition: all 0.3s ease;
             position: relative;
-        }
-        .sortable-item.recommended {
-            background: linear-gradient(135deg, #d1fae520 0%, #a7f3d015 100%);
-            border-left: 3px solid var(--secondary);
-        }
-        .sortable-item.immuno-highlight {
-            background: linear-gradient(135deg, #fef3c720 0%, #f59e0b15 100%);
-            border-left: 3px solid var(--warning);
         }
         .sortable-item:hover {
             transform: translateX(5px);
@@ -477,9 +392,6 @@
         }
         .sortable-item.removed .item-order-number {
             background: #9ca3af;
-        }
-        .sortable-item.immuno-highlight .item-order-number {
-            background: var(--warning);
         }
         .item-controls {
             display: flex;
@@ -623,9 +535,6 @@
         .week-2 { background-color: var(--week-color-2) !important; }
         .week-3 { background-color: var(--week-color-3) !important; }
         .week-4 { background-color: var(--week-color-4) !important; }
-        .phase-1 { border-left: 4px solid #10b981 !important; }
-        .phase-2 { border-left: 4px solid #f59e0b !important; }
-        .phase-3 { border-left: 4px solid #ef4444 !important; }
         .loading {
             display: none;
             text-align: center;
@@ -703,7 +612,7 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="studentName">👤 Nome do Aluno</label>
-                    <input type="text" id="studentName" placeholder="Digite seu nome completo">
+                    <input type="text" id="studentName" placeholder="Digite seu nome completo" value="Marcos Vilela">
                 </div>
                
                 <div class="form-group">
@@ -715,28 +624,26 @@
                     <label for="endDate">🎯 Data de Término (First Pass)</label>
                     <input type="date" id="endDate">
                 </div>
-
+                
                 <div class="form-group">
                     <label for="progressionFactor">⚡ Fator de Progressão</label>
-                    <input type="number" id="progressionFactor" min="2" max="20" value="4" placeholder="4">
-                </div>
-            </div>
-
-            <div class="progression-info">
-                <h3>📈 Sistema de Progressão Adaptativa</h3>
-                <p><strong>Como funciona:</strong> Seus dias úteis de estudo são divididos em 3 fases iguais:</p>
-                <p>• <strong>Fase 1 (Adaptação):</strong> x aulas por dia - ritmo mais calmo para se acostumar</p>
-                <p>• <strong>Fase 2 (Aceleração):</strong> 2x aulas por dia - aumentando o ritmo</p>
-                <p>• <strong>Fase 3 (Intensivo):</strong> [fator]x aulas por dia - ritmo máximo para finalizar</p>
-                
-                <div class="progression-example">
-                    <strong>Exemplo com Fator 4:</strong><br>
-                    Se o cálculo resultar em 3 aulas base por dia:<br>
-                    📗 Fase 1: 3 aulas/dia | 📙 Fase 2: 6 aulas/dia | 📕 Fase 3: 12 aulas/dia
+                    <input type="number" id="progressionFactor" value="4" min="2" max="20" step="1">
                 </div>
             </div>
             
-            <!-- DAYS OFF MASTER CONTAINER -->
+            <div class="info-card" style="background: linear-gradient(135deg, #10b98115 0%, #059f0f15 100%); border-left-color: var(--secondary);">
+                <h3>📈 Sistema de Progressão Adaptativa</h3>
+                <p><strong>Como funciona:</strong> Seus dias úteis de estudo são divididos em 3 fases iguais:</p>
+                <p style="margin-left: 20px;">
+                    • <strong>Fase 1 (Adaptação):</strong> x aulas por dia - ritmo mais calmo para se acostumar<br>
+                    • <strong>Fase 2 (Aceleração):</strong> 2x aulas por dia - aumentando o ritmo<br>
+                    • <strong>Fase 3 (Intensivo):</strong> [fator]×x aulas por dia - ritmo máximo para finalizar
+                </p>
+                <p><strong>Exemplo com Fator 4:</strong><br>
+                Se o cálculo resultar em 3 aulas base por dia:<br>
+                📗 Fase 1: 3 aulas/dia | 📙 Fase 2: 6 aulas/dia | 📕 Fase 3: 12 aulas/dia</p>
+            </div>
+            
             <div class="days-off-master-container">
                 <div class="days-off-header">
                     <h3>🚫 Configuração de Days Off</h3>
@@ -754,7 +661,6 @@
                     </button>
                 </div>
                 
-                <!-- TAB CONTENT: WEEKLY -->
                 <div id="weekly-tab" class="days-off-tab-content active">
                     <div class="days-off-container">
                         <div class="days-off-title">Dias fixos da semana sem estudo:</div>
@@ -774,22 +680,20 @@
                             <input type="checkbox" id="day-4" class="weekday-checkbox" value="4">
                             <label for="day-4" class="weekday-label">Quinta</label>
                            
-                            <input type="checkbox" id="day-5" class="weekday-checkbox" value="5">
+                            <input type="checkbox" id="day-5" class="weekday-checkbox" value="5" checked>
                             <label for="day-5" class="weekday-label">Sexta</label>
                            
-                            <input type="checkbox" id="day-6" class="weekday-checkbox" value="6">
+                            <input type="checkbox" id="day-6" class="weekday-checkbox" value="6" checked>
                             <label for="day-6" class="weekday-label">Sábado</label>
                         </div>
                     </div>
                 </div>
                 
-                <!-- TAB CONTENT: ALTERNATING -->
                 <div id="alternating-tab" class="days-off-tab-content">
                     <div class="days-off-container">
                         <div class="days-off-title">Configure dias que alternam (ex: a cada 2 domingos):</div>
                         
                         <div class="alternating-days-container">
-                            <!-- Domingo -->
                             <div class="alternating-day-item" id="alt-day-0">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <input type="checkbox" id="alt-enable-0" onchange="toggleAlternatingDay(0)">
@@ -820,7 +724,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Segunda -->
                             <div class="alternating-day-item" id="alt-day-1">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <input type="checkbox" id="alt-enable-1" onchange="toggleAlternatingDay(1)">
@@ -851,7 +754,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Terça -->
                             <div class="alternating-day-item" id="alt-day-2">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <input type="checkbox" id="alt-enable-2" onchange="toggleAlternatingDay(2)">
@@ -882,7 +784,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Quarta -->
                             <div class="alternating-day-item" id="alt-day-3">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <input type="checkbox" id="alt-enable-3" onchange="toggleAlternatingDay(3)">
@@ -913,7 +814,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Quinta -->
                             <div class="alternating-day-item" id="alt-day-4">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <input type="checkbox" id="alt-enable-4" onchange="toggleAlternatingDay(4)">
@@ -944,7 +844,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Sexta -->
                             <div class="alternating-day-item" id="alt-day-5">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <input type="checkbox" id="alt-enable-5" onchange="toggleAlternatingDay(5)">
@@ -975,7 +874,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Sábado -->
                             <div class="alternating-day-item" id="alt-day-6">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <input type="checkbox" id="alt-enable-6" onchange="toggleAlternatingDay(6)">
@@ -1009,13 +907,11 @@
                     </div>
                 </div>
                 
-                <!-- TAB CONTENT: INTERVAL -->
                 <div id="interval-tab" class="days-off-tab-content">
                     <div class="days-off-container">
                         <div class="days-off-title">Períodos específicos sem estudo (viagens, eventos, etc):</div>
                         
                         <div class="interval-list" id="intervalList">
-                            <!-- Intervals serão adicionados dinamicamente -->
                         </div>
                         
                         <button class="btn-add" onclick="addInterval()">
@@ -1024,7 +920,6 @@
                     </div>
                 </div>
                 
-                <!-- SUMMARY BOX -->
                 <div class="summary-box" id="daysOffSummary" style="display: none;">
                     <h4>📊 Resumo dos Days Off:</h4>
                     <div class="summary-list" id="summaryContent"></div>
@@ -1041,18 +936,6 @@
                     <div class="radio-option">
                         <input type="radio" id="orgSystem" name="organization" value="system">
                         <label for="orgSystem">System</label>
-                    </div>
-                </div>
-                
-                <div class="recommended-order-info">
-                    <h3>🎯 Ordem Recomendada Ativada!</h3>
-                    <p><strong>Esta ordem foi baseada em:</strong></p>
-                    <p>• <strong>Metodologia DI Mundology:</strong> Blocos de sistemas que se conectam</p>
-                    <p>• <strong>Sugestão do Léo (@MedicoAmerica):</strong> Fazer Imunologia ANTES de Musculoskeletal</p>
-                    <p>• <strong>Lógica Fisiológica:</strong> Cardio-Renal-Pulmonar → Metabólicos → Neurológicos → Básicas</p>
-                    
-                    <div class="immuno-highlight">
-                        <strong>🔥 DESTAQUE:</strong> Immunologia vem antes de MSK para você entender as bases das artrites autoimunes (RA, Lupus, Espondilite), mecanismos inflamatórios e como funcionam medicamentos como MTX e anti-TNF!
                     </div>
                 </div>
                
@@ -1082,7 +965,6 @@
     </div>
     
     <script>
-
         // Ordem recomendada baseada nas imagens + sugestão do Léo
         const RECOMMENDED_SYSTEM_ORDER = [
             "Cardiovascular System",
@@ -1134,7 +1016,6 @@
             "General Embryology"
         ];
 
-        // Course data truncado para exemplo
         const courseData = {
   "lectures": [
     {
@@ -3946,15 +3827,6 @@
   }
 };
 
-        for (let i = 0; i < 200; i++) {
-            courseData.lectures.push({
-                "lecture": `Test Lecture ${i + 1}`,
-                "duration": `${Math.floor(Math.random() * 40) + 10}m`,
-                "subject": RECOMMENDED_SUBJECT_ORDER[Math.floor(Math.random() * RECOMMENDED_SUBJECT_ORDER.length)],
-                "system": RECOMMENDED_SYSTEM_ORDER[Math.floor(Math.random() * RECOMMENDED_SYSTEM_ORDER.length)]
-            });
-        }
-
         let scheduleData = [];
         let organizationOrder = [];
         let removedItems = new Set();
@@ -3962,13 +3834,10 @@
         let alternatingDays = {};
         let dateIntervals = [];
 
-        // FUNÇÕES DE DAYS OFF
         function switchDaysOffTab(tab) {
-            // Remove active de todas as tabs
             document.querySelectorAll('.days-off-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.days-off-tab-content').forEach(c => c.classList.remove('active'));
             
-            // Adiciona active na tab selecionada
             event.target.classList.add('active');
             document.getElementById(`${tab}-tab`).classList.add('active');
             
@@ -3984,7 +3853,6 @@
                 controls.style.display = 'grid';
                 item.classList.add('active');
                 
-                // Salvar configuração
                 alternatingDays[dayNumber] = {
                     frequency: document.getElementById(`alt-freq-${dayNumber}`).value,
                     start: document.querySelector(`input[name="alt-start-${dayNumber}"]:checked`).value
@@ -4039,7 +3907,6 @@
             const summaryContent = document.getElementById('summaryContent');
             let summary = [];
             
-            // Days off semanais
             const weeklyDays = [];
             const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
             document.querySelectorAll('.weekday-checkbox:checked').forEach(checkbox => {
@@ -4049,16 +3916,13 @@
                 summary.push(`<strong>Semanais:</strong> ${weeklyDays.join(', ')}`);
             }
             
-            // Days off alternados
             Object.keys(alternatingDays).forEach(day => {
                 const dayName = dayNames[parseInt(day)];
-                const config = alternatingDays[day];
                 const freq = document.getElementById(`alt-freq-${day}`).value;
                 const start = document.querySelector(`input[name="alt-start-${day}"]:checked`).value;
                 summary.push(`<strong>Alternado:</strong> A cada ${freq} ${dayName.toLowerCase()}s (começando ${start === 'this' ? 'esta' : 'próxima'} semana)`);
             });
             
-            // Intervalos
             const intervals = document.querySelectorAll('[id^="interval-"][id$="-start"]');
             intervals.forEach(startInput => {
                 const id = startInput.id.match(/interval-start-(\d+)/)[1];
@@ -4084,14 +3948,15 @@
             
             const recommendedOrder = orgType === 'system' ? RECOMMENDED_SYSTEM_ORDER : RECOMMENDED_SUBJECT_ORDER;
             
+            // Primeiro, adicionar itens que estão na ordem recomendada
             organizationOrder = [];
-            
             recommendedOrder.forEach(item => {
                 if (uniqueItems.includes(item)) {
                     organizationOrder.push(item);
                 }
             });
             
+            // Depois, adicionar itens que não estão na ordem recomendada (ordenados alfabeticamente)
             const remainingItems = uniqueItems.filter(item => !recommendedOrder.includes(item)).sort();
             organizationOrder.push(...remainingItems);
             
@@ -4107,8 +3972,8 @@
             let html = `
                 <div style="margin-top: 20px;">
                     <label style="margin-bottom: 10px; display: block;">
-                        🎯 Arraste para reordenar ou clique no X para remover ${orgType === 'subject' ? 'Subjects' : 'Systems'}:
-                        <button class="reset-order-btn" onclick="resetToRecommendedOrder()">
+                        🎯 Arraste para reordenar ou clique no X para remover:
+                        <button class="reset-order-btn" onclick="resetToRecommendedOrder()" style="background: var(--secondary); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; margin-left: 15px; transition: all 0.3s ease;">
                             🔄 Restaurar Ordem Recomendada
                         </button>
                     </label>
@@ -4150,7 +4015,6 @@
             
             container.innerHTML = html;
             
-            // Adicionar funcionalidade de drag and drop
             const sortableList = document.getElementById('sortableList');
             let draggedElement = null;
             
@@ -4223,9 +4087,9 @@
             const studentName = document.getElementById('studentName').value;
             const startDate = new Date(document.getElementById('startDate').value);
             const endDate = new Date(document.getElementById('endDate').value);
-            const progressionFactor = parseInt(document.getElementById('progressionFactor').value) || 4;
+            const progressionFactor = parseInt(document.getElementById('progressionFactor').value);
             
-            if (!studentName || !startDate || !endDate || !progressionFactor) {
+            if (!studentName || !startDate || !endDate) {
                 alert('Por favor, preencha todos os campos!');
                 return;
             }
@@ -4234,19 +4098,12 @@
                 alert('A data de término deve ser posterior à data de início!');
                 return;
             }
-
-            if (progressionFactor < 2 || progressionFactor > 20) {
-                alert('O fator de progressão deve estar entre 2 e 20!');
-                return;
-            }
             
-            // Coletar todos os days off
             const weeklyDaysOff = [];
             document.querySelectorAll('.weekday-checkbox:checked').forEach(checkbox => {
                 weeklyDaysOff.push(parseInt(checkbox.value));
             });
             
-            // Coletar intervalos de datas
             const dateIntervals = [];
             const intervals = document.querySelectorAll('[id^="interval-"][id$="-start"]');
             intervals.forEach(startInput => {
@@ -4263,54 +4120,40 @@
             document.querySelector('.loading').classList.add('active');
             
             setTimeout(() => {
-                // Calcular dias disponíveis para estudo
                 let studyDays = [];
                 let currentDate = new Date(startDate);
-                let weekCounts = {}; // Para contar ocorrências de cada dia da semana
+                let weekCounts = {};
                 
-                // Inicializar contador de ocorrências para cada dia
                 for (let i = 0; i < 7; i++) {
                     weekCounts[i] = 0;
                 }
                 
                 while (currentDate <= endDate) {
                     const dayOfWeek = currentDate.getDay();
-                    const dateString = currentDate.toDateString();
                     let isDayOff = false;
                     
-                    // Incrementar contador para este dia da semana
                     weekCounts[dayOfWeek]++;
                     
-                    // Verificar days off semanais
                     if (weeklyDaysOff.includes(dayOfWeek)) {
                         isDayOff = true;
                     }
                     
-                    // Verificar days off alternados
                     if (!isDayOff && alternatingDays[dayOfWeek]) {
-                        const config = alternatingDays[dayOfWeek];
                         const frequency = parseInt(document.getElementById(`alt-freq-${dayOfWeek}`).value);
                         const startsThis = document.querySelector(`input[name="alt-start-${dayOfWeek}"]:checked`).value === 'this';
-                        
-                        // Calcular se este dia específico é day off
                         const occurrence = weekCounts[dayOfWeek];
                         
-                        // Se "começa esta semana", o primeiro dia é off, depois a cada N
-                        // Se "começa próxima semana", pula o primeiro e começa do segundo
                         if (startsThis) {
-                            // Primeira ocorrência é off, depois a cada 'frequency' ocorrências
                             if ((occurrence - 1) % frequency === 0) {
                                 isDayOff = true;
                             }
                         } else {
-                            // Segunda ocorrência é off, depois a cada 'frequency' ocorrências
                             if (occurrence > 1 && (occurrence - 2) % frequency === 0) {
                                 isDayOff = true;
                             }
                         }
                     }
                     
-                    // Verificar intervalos de datas
                     if (!isDayOff) {
                         for (let interval of dateIntervals) {
                             if (currentDate >= interval.start && currentDate <= interval.end) {
@@ -4332,20 +4175,12 @@
                     document.querySelector('.loading').classList.remove('active');
                     return;
                 }
-
-                if (studyDays.length < 6) {
-                    alert('Período muito curto! É necessário pelo menos 6 dias de estudo para dividir em 3 fases.');
-                    document.querySelector('.loading').classList.remove('active');
-                    return;
-                }
                 
-                // Filtrar aulas baseado nos itens removidos
                 const orgType = document.querySelector('input[name="organization"]:checked').value;
                 const filteredLectures = courseData.lectures.filter(lecture =>
                     !removedItems.has(lecture[orgType])
                 );
                 
-                // Ordenar aulas baseado na ordem definida pelo usuário
                 const sortedLectures = filteredLectures.sort((a, b) => {
                     const indexA = organizationOrder.indexOf(a[orgType]);
                     const indexB = organizationOrder.indexOf(b[orgType]);
@@ -4355,46 +4190,131 @@
                     }
                     return filteredLectures.indexOf(a) - filteredLectures.indexOf(b);
                 });
-
-                // NOVA LÓGICA DE PROGRESSÃO COM REPETIÇÃO DE AULAS
+                
                 const totalLectures = sortedLectures.length;
-                const totalStudyDays = studyDays.length;
+                const totalWorkDays = studyDays.length;
                 
-                // Dividir dias em terços
-                const phase1Days = Math.floor(totalStudyDays / 3);
-                const phase2Days = Math.floor(totalStudyDays / 3);
-                const phase3Days = totalStudyDays - phase1Days - phase2Days; // Resto vai para a última fase
+                // ==========================================
+                // ETAPA 1: DIVIDIR DIAS EM FASES
+                // Sobras vão para a Fase 1 (mais tempo de adaptação)
+                // ==========================================
+                const daysPerPhase = Math.floor(totalWorkDays / 3);
+                const extraDays = totalWorkDays % 3;
                 
-                // Definir número mínimo de aulas por dia na Fase 1
-                // Se há muitas aulas, começamos com mais; se há poucas, começamos com 1
-                let baseLecturesPerDay;
+                const phase1Days = daysPerPhase + extraDays;  // Sobras aqui
+                const phase2Days = daysPerPhase;
+                const phase3Days = daysPerPhase;
                 
-                if (totalLectures >= totalStudyDays) {
-                    // Caso normal: há aulas suficientes para distribuir
-                    const multiplier = phase1Days + (2 * phase2Days) + (progressionFactor * phase3Days);
-                    baseLecturesPerDay = Math.max(1, Math.floor(totalLectures / multiplier));
-                } else {
-                    // Caso especial: poucas aulas, começar com 1 aula por dia na Fase 1
-                    baseLecturesPerDay = 1;
-                }
-
-                // Distribuir aulas pelos dias (permitindo repetição quando necessário)
-                scheduleData = [];
+                console.log('=== ETAPA 1: DIVISÃO DE DIAS ===');
+                console.log('Total de dias úteis:', totalWorkDays);
+                console.log('Fase 1:', phase1Days, 'dias');
+                console.log('Fase 2:', phase2Days, 'dias');
+                console.log('Fase 3:', phase3Days, 'dias');
+                
+                // ==========================================
+                // ETAPA 2: CALCULAR QUANTAS AULAS ÚNICAS POR FASE
+                // Baseado no fator: x, 2x, fator×x
+                // Excedentes vão para Fase 3
+                // ==========================================
+                const totalSlots = 1 + 2 + progressionFactor;  // Ex: 1+2+4 = 7
+                const baseX = Math.floor(totalLectures / totalSlots);
+                const leftover = totalLectures % totalSlots;
+                
+                let phase1UniqueLectures = baseX * 1;  // x
+                let phase2UniqueLectures = baseX * 2;  // 2x
+                let phase3UniqueLectures = baseX * progressionFactor + leftover;  // fator×x + sobras
+                
+                console.log('=== ETAPA 2: AULAS ÚNICAS POR FASE ===');
+                console.log('baseX:', baseX);
+                console.log('Sobra de aulas:', leftover);
+                console.log('Fase 1:', phase1UniqueLectures, 'aulas únicas');
+                console.log('Fase 2:', phase2UniqueLectures, 'aulas únicas');
+                console.log('Fase 3:', phase3UniqueLectures, 'aulas únicas');
+                
+                // ==========================================
+                // ETAPA 3: CALCULAR AULAS POR DIA EM CADA FASE
+                // ==========================================
+                const phase1LecturesPerDay = phase1UniqueLectures > 0 ? Math.max(1, Math.ceil(phase1UniqueLectures / phase1Days)) : 1;
+                const phase2LecturesPerDay = phase2UniqueLectures > 0 ? Math.max(1, Math.ceil(phase2UniqueLectures / phase2Days)) : 2;
+                const phase3LecturesPerDay = phase3UniqueLectures > 0 ? Math.max(1, Math.ceil(phase3UniqueLectures / phase3Days)) : progressionFactor;
+                
+                console.log('=== ETAPA 3: AULAS POR DIA ===');
+                console.log('Fase 1:', phase1LecturesPerDay, 'aulas/dia');
+                console.log('Fase 2:', phase2LecturesPerDay, 'aulas/dia');
+                console.log('Fase 3:', phase3LecturesPerDay, 'aulas/dia');
+                
+                // ==========================================
+                // ETAPA 4: DEFINIR QUAIS AULAS VÃO EM CADA FASE
+                // ==========================================
                 let lectureIndex = 0;
                 
-                // FASE 1: x aulas por dia
-                const phase1LecturesPerDay = baseLecturesPerDay;
-                for (let i = 0; i < phase1Days; i++) {
-                    const date = studyDays[i];
+                const phase1Lectures = [];
+                for (let i = 0; i < phase1UniqueLectures && lectureIndex < totalLectures; i++) {
+                    phase1Lectures.push(sortedLectures[lectureIndex]);
+                    lectureIndex++;
+                }
+                
+                const phase2Lectures = [];
+                for (let i = 0; i < phase2UniqueLectures && lectureIndex < totalLectures; i++) {
+                    phase2Lectures.push(sortedLectures[lectureIndex]);
+                    lectureIndex++;
+                }
+                
+                const phase3Lectures = [];
+                for (let i = 0; i < phase3UniqueLectures && lectureIndex < totalLectures; i++) {
+                    phase3Lectures.push(sortedLectures[lectureIndex]);
+                    lectureIndex++;
+                }
+                
+                console.log('=== ETAPA 4: AULAS POR FASE ===');
+                console.log('Fase 1 aulas:', phase1Lectures.map(l => l.lecture));
+                console.log('Fase 2 aulas:', phase2Lectures.map(l => l.lecture));
+                console.log('Fase 3 aulas:', phase3Lectures.map(l => l.lecture));
+                
+                // ==========================================
+                // ETAPA 5: CRIAR FILAS COM REPETIÇÕES CONSECUTIVAS
+                // ==========================================
+                function createPhaseQueue(phaseLectures, phaseDays, lecturesPerDay) {
+                    const totalSlots = phaseDays * lecturesPerDay;
+                    const numLectures = phaseLectures.length;
+                    
+                    if (numLectures === 0) return [];
+                    
+                    const repsPerLecture = Math.ceil(totalSlots / numLectures);
+                    const queue = [];
+                    
+                    for (let i = 0; i < numLectures; i++) {
+                        for (let rep = 0; rep < repsPerLecture; rep++) {
+                            queue.push(phaseLectures[i]);
+                        }
+                    }
+                    
+                    return queue.slice(0, totalSlots);  // Limita ao total de slots
+                }
+                
+                const phase1Queue = createPhaseQueue(phase1Lectures, phase1Days, phase1LecturesPerDay);
+                const phase2Queue = createPhaseQueue(phase2Lectures, phase2Days, phase2LecturesPerDay);
+                const phase3Queue = createPhaseQueue(phase3Lectures, phase3Days, phase3LecturesPerDay);
+                
+                console.log('=== ETAPA 5: FILAS CRIADAS ===');
+                console.log('Fila Fase 1 (', phase1Queue.length, 'slots):', phase1Queue.map(l => l.lecture));
+                console.log('Fila Fase 2 (', phase2Queue.length, 'slots):', phase2Queue.map(l => l.lecture));
+                console.log('Fila Fase 3 (', phase3Queue.length, 'slots):', phase3Queue.map(l => l.lecture));
+                
+                // ==========================================
+                // ETAPA 6: DISTRIBUIR PELOS DIAS
+                // ==========================================
+                scheduleData = [];
+                let globalDayIndex = 0;
+                
+                // FASE 1
+                let phase1QueueIndex = 0;
+                for (let dayInPhase = 0; dayInPhase < phase1Days; dayInPhase++) {
+                    const date = studyDays[globalDayIndex];
                     const weekNumber = Math.floor((date - startDate) / (1000 * 60 * 60 * 24 * 7)) + 1;
                     
-                    for (let j = 0; j < phase1LecturesPerDay; j++) {
-                        // Se chegou ao fim das aulas, reinicia do começo (permite repetição)
-                        if (lectureIndex >= totalLectures) {
-                            lectureIndex = 0;
-                        }
-                        
-                        const lecture = sortedLectures[lectureIndex];
+                    for (let lectureInDay = 0; lectureInDay < phase1LecturesPerDay && phase1QueueIndex < phase1Queue.length; lectureInDay++) {
+                        const lecture = phase1Queue[phase1QueueIndex];
                         scheduleData.push({
                             week: `Semana ${weekNumber}`,
                             weekNumber: weekNumber,
@@ -4404,27 +4324,24 @@
                             system: lecture.system,
                             lecture: lecture.lecture,
                             duration: lecture.duration,
-                            phase: 1,
+                            phase: 'Fase 1 (Adaptação)',
+                            phaseNumber: 1,
                             status: '',
                             notes: ''
                         });
-                        lectureIndex++;
+                        phase1QueueIndex++;
                     }
+                    globalDayIndex++;
                 }
                 
-                // FASE 2: 2x aulas por dia
-                const phase2LecturesPerDay = 2 * baseLecturesPerDay;
-                for (let i = phase1Days; i < phase1Days + phase2Days; i++) {
-                    const date = studyDays[i];
+                // FASE 2
+                let phase2QueueIndex = 0;
+                for (let dayInPhase = 0; dayInPhase < phase2Days; dayInPhase++) {
+                    const date = studyDays[globalDayIndex];
                     const weekNumber = Math.floor((date - startDate) / (1000 * 60 * 60 * 24 * 7)) + 1;
                     
-                    for (let j = 0; j < phase2LecturesPerDay; j++) {
-                        // Se chegou ao fim das aulas, reinicia do começo (permite repetição)
-                        if (lectureIndex >= totalLectures) {
-                            lectureIndex = 0;
-                        }
-                        
-                        const lecture = sortedLectures[lectureIndex];
+                    for (let lectureInDay = 0; lectureInDay < phase2LecturesPerDay && phase2QueueIndex < phase2Queue.length; lectureInDay++) {
+                        const lecture = phase2Queue[phase2QueueIndex];
                         scheduleData.push({
                             week: `Semana ${weekNumber}`,
                             weekNumber: weekNumber,
@@ -4434,28 +4351,24 @@
                             system: lecture.system,
                             lecture: lecture.lecture,
                             duration: lecture.duration,
-                            phase: 2,
+                            phase: 'Fase 2 (Aceleração)',
+                            phaseNumber: 2,
                             status: '',
                             notes: ''
                         });
-                        lectureIndex++;
+                        phase2QueueIndex++;
                     }
+                    globalDayIndex++;
                 }
                 
-                // FASE 3: fator*x aulas por dia
-                const phase3LecturesPerDay = progressionFactor * baseLecturesPerDay;
-                
-                for (let i = phase1Days + phase2Days; i < totalStudyDays; i++) {
-                    const date = studyDays[i];
+                // FASE 3
+                let phase3QueueIndex = 0;
+                for (let dayInPhase = 0; dayInPhase < phase3Days; dayInPhase++) {
+                    const date = studyDays[globalDayIndex];
                     const weekNumber = Math.floor((date - startDate) / (1000 * 60 * 60 * 24 * 7)) + 1;
                     
-                    for (let j = 0; j < phase3LecturesPerDay; j++) {
-                        // Se chegou ao fim das aulas, reinicia do começo (permite repetição)
-                        if (lectureIndex >= totalLectures) {
-                            lectureIndex = 0;
-                        }
-                        
-                        const lecture = sortedLectures[lectureIndex];
+                    for (let lectureInDay = 0; lectureInDay < phase3LecturesPerDay && phase3QueueIndex < phase3Queue.length; lectureInDay++) {
+                        const lecture = phase3Queue[phase3QueueIndex];
                         scheduleData.push({
                             week: `Semana ${weekNumber}`,
                             weekNumber: weekNumber,
@@ -4465,23 +4378,20 @@
                             system: lecture.system,
                             lecture: lecture.lecture,
                             duration: lecture.duration,
-                            phase: 3,
+                            phase: 'Fase 3 (Intensivo)',
+                            phaseNumber: 3,
                             status: '',
                             notes: ''
                         });
-                        lectureIndex++;
+                        phase3QueueIndex++;
                     }
+                    globalDayIndex++;
                 }
                 
-                displayPreview(studyDays.length, totalLectures, {
-                    phase1Days, 
-                    phase2Days, 
-                    phase3Days, 
-                    phase1LecturesPerDay, 
-                    phase2LecturesPerDay, 
-                    phase3LecturesPerDay: phase3LecturesPerDay,
-                    progressionFactor
-                });
+                console.log('=== CRONOGRAMA FINAL ===');
+                console.log('Total de entradas:', scheduleData.length);
+                
+                displayPreview(totalWorkDays, totalLectures, phase1Days, phase2Days, phase3Days, phase1LecturesPerDay, phase2LecturesPerDay, phase3LecturesPerDay);
                 document.getElementById('downloadBtn').disabled = false;
                 document.querySelector('.loading').classList.remove('active');
             }, 1000);
@@ -4499,14 +4409,10 @@
             return `${day}/${month}/${year}`;
         }
         
-        function displayPreview(studyDaysCount, totalLectures, progressionData) {
+        function displayPreview(studyDaysCount, totalLectures, phase1Days, phase2Days, phase3Days, phase1Lectures, phase2Lectures, phase3Lectures) {
             const previewContainer = document.getElementById('previewContainer');
             const statsGrid = document.getElementById('statsGrid');
             const previewTable = document.getElementById('previewTable');
-            
-            const { phase1Days, phase2Days, phase3Days, phase1LecturesPerDay, phase2LecturesPerDay, phase3LecturesPerDay, progressionFactor } = progressionData;
-            
-            const totalWeeks = Math.ceil((new Date(document.getElementById('endDate').value) - new Date(document.getElementById('startDate').value)) / (1000 * 60 * 60 * 24 * 7));
             
             statsGrid.innerHTML = `
                 <div class="stat-card">
@@ -4515,33 +4421,28 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-value">${totalLectures}</div>
-                    <div class="stat-label">Total de Aulas</div>
+                    <div class="stat-label">Aulas Únicas</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value">${progressionFactor}x</div>
-                    <div class="stat-label">Fator de Progressão</div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #d1fae520, #a7f3d015); border-left: 3px solid var(--secondary);">
+                    <div class="stat-value" style="color: var(--secondary);">📗 ${phase1Days} dias</div>
+                    <div class="stat-label">Fase 1: ${phase1Lectures} aulas/dia</div>
                 </div>
-                <div class="stat-card phase-1">
-                    <div class="stat-value">${phase1LecturesPerDay}</div>
-                    <div class="stat-label">Fase 1 (${phase1Days}d)</div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #fef3c720, #f59e0b15); border-left: 3px solid var(--warning);">
+                    <div class="stat-value" style="color: var(--warning);">📙 ${phase2Days} dias</div>
+                    <div class="stat-label">Fase 2: ${phase2Lectures} aulas/dia</div>
                 </div>
-                <div class="stat-card phase-2">
-                    <div class="stat-value">${phase2LecturesPerDay}</div>
-                    <div class="stat-label">Fase 2 (${phase2Days}d)</div>
-                </div>
-                <div class="stat-card phase-3">
-                    <div class="stat-value">${phase3LecturesPerDay}</div>
-                    <div class="stat-label">Fase 3 (${phase3Days}d)</div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #fee2e220, #ef444415); border-left: 3px solid var(--danger);">
+                    <div class="stat-value" style="color: var(--danger);">📕 ${phase3Days} dias</div>
+                    <div class="stat-label">Fase 3: ${phase3Lectures} aulas/dia</div>
                 </div>
             `;
             
             let html = '<table class="preview-table">';
             html += '<thead><tr>';
-            html += '<th>Fase</th>';
             html += '<th>Semana</th>';
             html += '<th>Data</th>';
+            html += '<th>Fase</th>';
             html += '<th>Subject</th>';
-            html += '<th>System</th>';
             html += '<th>Aula</th>';
             html += '<th>Duração</th>';
             html += '</tr></thead>';
@@ -4551,15 +4452,17 @@
             
             limitedData.forEach(row => {
                 const weekClass = `week-${((row.weekNumber - 1) % 4) + 1}`;
-                const phaseClass = `phase-${row.phase}`;
-                const phaseLabel = row.phase === 1 ? '📗 Adaptação' : row.phase === 2 ? '📙 Aceleração' : '📕 Intensivo';
-                
-                html += `<tr class="${weekClass} ${phaseClass}">`;
-                html += `<td><strong>${phaseLabel}</strong></td>`;
+                html += `<tr class="${weekClass}">`;
                 html += `<td>${row.week}</td>`;
                 html += `<td>${row.dayOfWeek}<br>${row.date}</td>`;
+                
+                let phaseColor = '';
+                if (row.phaseNumber === 1) phaseColor = 'color: var(--secondary); font-weight: 600;';
+                else if (row.phaseNumber === 2) phaseColor = 'color: var(--warning); font-weight: 600;';
+                else if (row.phaseNumber === 3) phaseColor = 'color: var(--danger); font-weight: 600;';
+                
+                html += `<td style="${phaseColor}">${row.phase}</td>`;
                 html += `<td>${row.subject}</td>`;
-                html += `<td>${row.system}</td>`;
                 html += `<td>${row.lecture}</td>`;
                 html += `<td>${row.duration}</td>`;
                 html += '</tr>';
@@ -4579,25 +4482,23 @@
         
         function downloadExcel() {
             const studentName = document.getElementById('studentName').value;
-            const progressionFactor = document.getElementById('progressionFactor').value;
             const wb = XLSX.utils.book_new();
             
             const headerData = [
                 ['Ward Academy - De Old para Old'],
-                [`Cronograma USMLE Step 1 - ${studentName}`],
-                [`Cronograma Progressivo (Fator ${progressionFactor}x) - @usmle.wardacademy`],
+                [`Cronograma Progressivo USMLE Step 1 - ${studentName}`],
+                [`@usmle.wardacademy`],
                 [],
-                ['Fase', 'Semana', 'Data', 'Subject', 'System', 'Aulas', 'Duração', 'Concluído', 'Anotações']
+                ['Semana', 'Data', 'Fase', 'Subject', 'System', 'Aulas', 'Duração', 'Concluído', 'Anotações']
             ];
             
             const wsData = [...headerData];
             
             scheduleData.forEach(row => {
-                const phaseLabel = row.phase === 1 ? 'Fase 1 - Adaptação' : row.phase === 2 ? 'Fase 2 - Aceleração' : 'Fase 3 - Intensivo';
                 wsData.push([
-                    phaseLabel,
                     row.week,
                     `${row.dayOfWeek}\n${row.date}`,
+                    row.phase,
                     row.subject,
                     row.system,
                     row.lecture,
@@ -4609,17 +4510,15 @@
             
             const ws = XLSX.utils.aoa_to_sheet(wsData);
             
-            // Inicializar array de merges com cabeçalho
             ws['!merges'] = [
                 { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
                 { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
                 { s: { r: 2, c: 0 }, e: { r: 2, c: 8 } }
             ];
             
-            // Função auxiliar para adicionar merges
             function addMerges(columnIndex) {
                 let currentValue = '';
-                let startRow = 5; // Começa após o cabeçalho
+                let startRow = 5;
                 
                 for (let i = 0; i <= scheduleData.length; i++) {
                     const rowData = i < scheduleData.length ? scheduleData[i] : null;
@@ -4627,27 +4526,21 @@
                     
                     let cellValue = '';
                     if (rowData) {
-                        if (columnIndex === 0) {
-                            cellValue = rowData.phase === 1 ? 'Fase 1 - Adaptação' : 
-                                      rowData.phase === 2 ? 'Fase 2 - Aceleração' : 'Fase 3 - Intensivo';
-                        }
-                        else if (columnIndex === 1) cellValue = rowData.week;
-                        else if (columnIndex === 2) cellValue = `${rowData.dayOfWeek}\n${rowData.date}`;
+                        if (columnIndex === 0) cellValue = rowData.week;
+                        else if (columnIndex === 1) cellValue = `${rowData.dayOfWeek}\n${rowData.date}`;
+                        else if (columnIndex === 2) cellValue = rowData.phase;
                         else if (columnIndex === 3) cellValue = rowData.subject;
                         else if (columnIndex === 4) cellValue = rowData.system;
                         else if (columnIndex === 6) cellValue = rowData.duration;
                     }
                     
-                    // Se mudou o valor ou chegou ao fim
                     if (!rowData || cellValue !== currentValue) {
-                        // Mesclar grupo anterior se tinha mais de uma linha
                         if (currentValue !== '' && excelRow - 1 > startRow) {
                             ws['!merges'].push({
                                 s: { r: startRow, c: columnIndex },
                                 e: { r: excelRow - 1, c: columnIndex }
                             });
                         }
-                        // Iniciar novo grupo
                         if (rowData) {
                             currentValue = cellValue;
                             startRow = excelRow;
@@ -4656,40 +4549,37 @@
                 }
             }
             
-            // Aplicar merges para todas as colunas necessárias
             if (scheduleData.length > 0) {
-                addMerges(0); // Coluna Fase
-                addMerges(1); // Coluna Semana
-                addMerges(2); // Coluna Data
-                addMerges(3); // Coluna Subject
-                addMerges(4); // Coluna System
-                addMerges(6); // Coluna Duração
+                addMerges(0);
+                addMerges(1);
+                addMerges(2);
+                addMerges(3);
+                addMerges(4);
+                addMerges(6);
             }
             
-            // Configurar largura das colunas
             ws['!cols'] = [
-                { wch: 18 }, // Fase
-                { wch: 12 }, // Semana
-                { wch: 20 }, // Data
-                { wch: 35 }, // Subject
-                { wch: 35 }, // System
-                { wch: 60 }, // Aulas
-                { wch: 10 }, // Duração
-                { wch: 12 }, // Status
-                { wch: 30 }  // Anotações
+                { wch: 12 },
+                { wch: 20 },
+                { wch: 22 },
+                { wch: 30 },
+                { wch: 30 },
+                { wch: 55 },
+                { wch: 10 },
+                { wch: 12 },
+                { wch: 30 }
             ];
             
-            // Aplicar estilos e cores alternadas por fase
             const phaseColors = {
-                1: 'E0F2FE', // Azul claro - Adaptação
-                2: 'FEF3C7', // Amarelo claro - Aceleração  
-                3: 'FEE2E2'  // Vermelho claro - Intensivo
+                1: 'D1FAE5',
+                2: 'FEF3C7',
+                3: 'FEE2E2'
             };
             
             for (let i = 0; i < scheduleData.length; i++) {
                 const rowData = scheduleData[i];
                 const excelRow = i + 5;
-                const bgColor = phaseColors[rowData.phase];
+                const bgColor = phaseColors[rowData.phaseNumber];
                 
                 for (let col = 0; col <= 8; col++) {
                     const cellAddress = XLSX.utils.encode_cell({ r: excelRow, c: col });
@@ -4712,18 +4602,18 @@
                 }
             }
             
-            XLSX.utils.book_append_sheet(wb, ws, 'Cronograma Progressivo');
+            XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
             
             const fileName = `Cronograma_Progressivo_${studentName.replace(/\s+/g, '_')}_USMLE_Step1.xlsx`;
             XLSX.writeFile(wb, fileName);
         }
         
-        // Inicialização
         window.onload = function() {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
+            const today = new Date();
+            today.setDate(today.getDate() + 1);
+            const tomorrow = new Date(today);
             const endDate = new Date(tomorrow);
-            endDate.setMonth(endDate.getMonth() + 6);
+            endDate.setDate(endDate.getDate() + 14);
             
             document.getElementById('startDate').valueAsDate = tomorrow;
             document.getElementById('endDate').valueAsDate = endDate;
@@ -4736,7 +4626,6 @@
                 });
             });
             
-            // Listeners para atualizar configurações de dias alternados
             for (let day = 0; day < 7; day++) {
                 const freqSelect = document.getElementById(`alt-freq-${day}`);
                 if (freqSelect) {
@@ -4759,10 +4648,11 @@
                 });
             }
             
-            // Listener para days off semanais
             document.querySelectorAll('.weekday-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', updateDaysOffSummary);
             });
+            
+            updateDaysOffSummary();
         };
     </script>
 </body>
