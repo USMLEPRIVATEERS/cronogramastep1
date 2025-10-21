@@ -1029,8 +1029,6 @@
     </div>
     
     <script>
-
-        // Ordem recomendada baseada nas imagens + sugestão do Léo
         const RECOMMENDED_SYSTEM_ORDER = [
             "Cardiovascular System",
             "Renal Urinary Systems and Electrolytes", 
@@ -3897,15 +3895,40 @@ const courseData = {
         let removedItems = new Set();
         let intervalCount = 0;
         let alternatingDays = {};
-        let dateIntervals = [];
 
-        // FUNÇÕES DE DAYS OFF
+        // FUNÇÃO AUXILIAR: Normalizar data para comparação (apenas dia/mês/ano)
+        function normalizeDate(date) {
+            const normalized = new Date(date);
+            normalized.setHours(0, 0, 0, 0);
+            return normalized;
+        }
+
+        // FUNÇÃO AUXILIAR: Criar data local do input
+        function createLocalDate(dateString) {
+            // dateString está no formato YYYY-MM-DD
+            const [year, month, day] = dateString.split('-').map(Number);
+            return new Date(year, month - 1, day);
+        }
+
+        // FUNÇÃO AUXILIAR: Comparar se duas datas são iguais (ignorando hora)
+        function isSameDay(date1, date2) {
+            return date1.getFullYear() === date2.getFullYear() &&
+                   date1.getMonth() === date2.getMonth() &&
+                   date1.getDate() === date2.getDate();
+        }
+
+        // FUNÇÃO AUXILIAR: Verificar se data está em intervalo
+        function isDateInInterval(date, start, end) {
+            const checkDate = normalizeDate(date);
+            const startDate = normalizeDate(start);
+            const endDate = normalizeDate(end);
+            return checkDate >= startDate && checkDate <= endDate;
+        }
+
         function switchDaysOffTab(tab) {
-            // Remove active de todas as tabs
             document.querySelectorAll('.days-off-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.days-off-tab-content').forEach(c => c.classList.remove('active'));
             
-            // Adiciona active na tab selecionada
             event.target.classList.add('active');
             document.getElementById(`${tab}-tab`).classList.add('active');
             
@@ -3921,7 +3944,6 @@ const courseData = {
                 controls.style.display = 'grid';
                 item.classList.add('active');
                 
-                // Salvar configuração
                 alternatingDays[dayNumber] = {
                     frequency: document.getElementById(`alt-freq-${dayNumber}`).value,
                     start: document.querySelector(`input[name="alt-start-${dayNumber}"]:checked`).value
@@ -3989,20 +4011,19 @@ const courseData = {
             // Days off alternados
             Object.keys(alternatingDays).forEach(day => {
                 const dayName = dayNames[parseInt(day)];
-                const config = alternatingDays[day];
                 const freq = document.getElementById(`alt-freq-${day}`).value;
                 const start = document.querySelector(`input[name="alt-start-${day}"]:checked`).value;
                 summary.push(`<strong>Alternado:</strong> A cada ${freq} ${dayName.toLowerCase()}s (começando ${start === 'this' ? 'esta' : 'próxima'} semana)`);
             });
             
             // Intervalos
-            const intervals = document.querySelectorAll('[id^="interval-"][id$="-start"]');
+            const intervals = document.querySelectorAll('[id^="interval-start-"]');
             intervals.forEach(startInput => {
                 const id = startInput.id.match(/interval-start-(\d+)/)[1];
                 const endInput = document.getElementById(`interval-end-${id}`);
                 if (startInput.value && endInput.value) {
-                    const start = new Date(startInput.value).toLocaleDateString('pt-BR');
-                    const end = new Date(endInput.value).toLocaleDateString('pt-BR');
+                    const start = createLocalDate(startInput.value).toLocaleDateString('pt-BR');
+                    const end = createLocalDate(endInput.value).toLocaleDateString('pt-BR');
                     summary.push(`<strong>Intervalo:</strong> ${start} até ${end}`);
                 }
             });
@@ -4080,14 +4101,10 @@ const courseData = {
                 `;
             });
             
-            html += `
-                    </ul>
-                </div>
-            `;
+            html += '</ul></div>';
             
             container.innerHTML = html;
             
-            // Adicionar funcionalidade de drag and drop
             const sortableList = document.getElementById('sortableList');
             let draggedElement = null;
             
@@ -4158,38 +4175,46 @@ const courseData = {
         
         function generateSchedule() {
             const studentName = document.getElementById('studentName').value;
-            const startDate = new Date(document.getElementById('startDate').value);
-            const endDate = new Date(document.getElementById('endDate').value);
+            const startDateStr = document.getElementById('startDate').value;
+            const endDateStr = document.getElementById('endDate').value;
             
-            if (!studentName || !startDate || !endDate) {
+            if (!studentName || !startDateStr || !endDateStr) {
                 alert('Por favor, preencha todos os campos!');
                 return;
             }
+            
+            const startDate = createLocalDate(startDateStr);
+            const endDate = createLocalDate(endDateStr);
             
             if (startDate >= endDate) {
                 alert('A data de término deve ser posterior à data de início!');
                 return;
             }
             
-            // Coletar todos os days off
+            // Coletar todos os days off semanais
             const weeklyDaysOff = [];
             document.querySelectorAll('.weekday-checkbox:checked').forEach(checkbox => {
                 weeklyDaysOff.push(parseInt(checkbox.value));
             });
             
-            // Coletar intervalos de datas
+            // Coletar intervalos de datas usando createLocalDate
             const dateIntervals = [];
-            const intervals = document.querySelectorAll('[id^="interval-"][id$="-start"]');
-            intervals.forEach(startInput => {
+            const intervalInputs = document.querySelectorAll('[id^="interval-start-"]');
+            intervalInputs.forEach(startInput => {
                 const id = startInput.id.match(/interval-start-(\d+)/)[1];
                 const endInput = document.getElementById(`interval-end-${id}`);
                 if (startInput.value && endInput.value) {
                     dateIntervals.push({
-                        start: new Date(startInput.value),
-                        end: new Date(endInput.value)
+                        start: createLocalDate(startInput.value),
+                        end: createLocalDate(endInput.value)
                     });
                 }
             });
+            
+            console.log('Intervalos configurados:', dateIntervals.map(i => ({
+                start: i.start.toLocaleDateString('pt-BR'),
+                end: i.end.toLocaleDateString('pt-BR')
+            })));
             
             document.querySelector('.loading').classList.add('active');
             
@@ -4197,66 +4222,67 @@ const courseData = {
                 // Calcular dias disponíveis para estudo
                 let studyDays = [];
                 let currentDate = new Date(startDate);
-                let weekCounts = {}; // Para contar ocorrências de cada dia da semana
+                let weekCounts = {};
                 
-                // Inicializar contador de ocorrências para cada dia
                 for (let i = 0; i < 7; i++) {
                     weekCounts[i] = 0;
                 }
                 
+                let daysOffCount = 0;
+                
                 while (currentDate <= endDate) {
                     const dayOfWeek = currentDate.getDay();
-                    const dateString = currentDate.toDateString();
                     let isDayOff = false;
                     
-                    // Incrementar contador para este dia da semana
                     weekCounts[dayOfWeek]++;
                     
-                    // Verificar days off semanais
+                    // 1. Verificar days off semanais
                     if (weeklyDaysOff.includes(dayOfWeek)) {
                         isDayOff = true;
+                        console.log(`Day off semanal: ${currentDate.toLocaleDateString('pt-BR')} (${getDayName(dayOfWeek)})`);
                     }
                     
-                    // Verificar days off alternados
+                    // 2. Verificar days off alternados
                     if (!isDayOff && alternatingDays[dayOfWeek]) {
-                        const config = alternatingDays[dayOfWeek];
                         const frequency = parseInt(document.getElementById(`alt-freq-${dayOfWeek}`).value);
                         const startsThis = document.querySelector(`input[name="alt-start-${dayOfWeek}"]:checked`).value === 'this';
-                        
-                        // Calcular se este dia específico é day off
                         const occurrence = weekCounts[dayOfWeek];
                         
-                        // Se "começa esta semana", o primeiro dia é off, depois a cada N
-                        // Se "começa próxima semana", pula o primeiro e começa do segundo
                         if (startsThis) {
-                            // Primeira ocorrência é off, depois a cada 'frequency' ocorrências
                             if ((occurrence - 1) % frequency === 0) {
                                 isDayOff = true;
+                                console.log(`Day off alternado: ${currentDate.toLocaleDateString('pt-BR')} (${getDayName(dayOfWeek)}, ocorrência ${occurrence})`);
                             }
                         } else {
-                            // Segunda ocorrência é off, depois a cada 'frequency' ocorrências
                             if (occurrence > 1 && (occurrence - 2) % frequency === 0) {
                                 isDayOff = true;
+                                console.log(`Day off alternado: ${currentDate.toLocaleDateString('pt-BR')} (${getDayName(dayOfWeek)}, ocorrência ${occurrence})`);
                             }
                         }
                     }
                     
-                    // Verificar intervalos de datas
+                    // 3. Verificar intervalos de datas - CORRIGIDO
                     if (!isDayOff) {
                         for (let interval of dateIntervals) {
-                            if (currentDate >= interval.start && currentDate <= interval.end) {
+                            if (isDateInInterval(currentDate, interval.start, interval.end)) {
                                 isDayOff = true;
+                                console.log(`Day off por intervalo: ${currentDate.toLocaleDateString('pt-BR')} (entre ${interval.start.toLocaleDateString('pt-BR')} e ${interval.end.toLocaleDateString('pt-BR')})`);
                                 break;
                             }
                         }
                     }
                     
-                    if (!isDayOff) {
+                    if (isDayOff) {
+                        daysOffCount++;
+                    } else {
                         studyDays.push(new Date(currentDate));
                     }
                     
                     currentDate.setDate(currentDate.getDate() + 1);
                 }
+                
+                console.log(`Total de dias off: ${daysOffCount}`);
+                console.log(`Total de dias de estudo: ${studyDays.length}`);
                 
                 if (studyDays.length === 0) {
                     alert('Não há dias disponíveis para estudo! Verifique as datas e os days off.');
@@ -4270,7 +4296,7 @@ const courseData = {
                     !removedItems.has(lecture[orgType])
                 );
                 
-                // Ordenar aulas baseado na ordem definida pelo usuário
+                // Ordenar aulas
                 const sortedLectures = filteredLectures.sort((a, b) => {
                     const indexA = organizationOrder.indexOf(a[orgType]);
                     const indexB = organizationOrder.indexOf(b[orgType]);
@@ -4281,13 +4307,12 @@ const courseData = {
                     return filteredLectures.indexOf(a) - filteredLectures.indexOf(b);
                 });
                 
-                // Calcular distribuição de aulas
+                // Distribuir aulas
                 const totalLectures = sortedLectures.length;
                 const avgLecturesPerDay = totalLectures / studyDays.length;
                 const baseLecturesPerDay = Math.floor(avgLecturesPerDay);
                 const extraLectures = totalLectures % studyDays.length;
                 
-                // Distribuir aulas pelos dias
                 scheduleData = [];
                 let lectureIndex = 0;
                 
@@ -4339,7 +4364,9 @@ const courseData = {
             const previewTable = document.getElementById('previewTable');
             
             const avgLecturesPerDay = (totalLectures / studyDaysCount).toFixed(1);
-            const totalWeeks = Math.ceil((new Date(document.getElementById('endDate').value) - new Date(document.getElementById('startDate').value)) / (1000 * 60 * 60 * 24 * 7));
+            const startDate = createLocalDate(document.getElementById('startDate').value);
+            const endDate = createLocalDate(document.getElementById('endDate').value);
+            const totalWeeks = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24 * 7));
             
             statsGrid.innerHTML = `
                 <div class="stat-card">
@@ -4426,17 +4453,15 @@ const courseData = {
             
             const ws = XLSX.utils.aoa_to_sheet(wsData);
             
-            // Inicializar array de merges com cabeçalho
             ws['!merges'] = [
                 { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
                 { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
                 { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } }
             ];
             
-            // Função auxiliar para adicionar merges
-            function addMerges(columnIndex, columnName) {
+            function addMerges(columnIndex) {
                 let currentValue = '';
-                let startRow = 5; // Começa após o cabeçalho
+                let startRow = 5;
                 
                 for (let i = 0; i <= scheduleData.length; i++) {
                     const rowData = i < scheduleData.length ? scheduleData[i] : null;
@@ -4451,16 +4476,13 @@ const courseData = {
                         else if (columnIndex === 5) cellValue = rowData.duration;
                     }
                     
-                    // Se mudou o valor ou chegou ao fim
                     if (!rowData || cellValue !== currentValue) {
-                        // Mesclar grupo anterior se tinha mais de uma linha
                         if (currentValue !== '' && excelRow - 1 > startRow) {
                             ws['!merges'].push({
                                 s: { r: startRow, c: columnIndex },
                                 e: { r: excelRow - 1, c: columnIndex }
                             });
                         }
-                        // Iniciar novo grupo
                         if (rowData) {
                             currentValue = cellValue;
                             startRow = excelRow;
@@ -4469,28 +4491,25 @@ const courseData = {
                 }
             }
             
-            // Aplicar merges para todas as colunas necessárias
             if (scheduleData.length > 0) {
-                addMerges(0, 'week');        // Coluna Semana
-                addMerges(1, 'date');        // Coluna Data
-                addMerges(2, 'subject');     // Coluna Subject
-                addMerges(3, 'system');      // Coluna System
-                addMerges(5, 'duration');    // Coluna Duração (se consecutivas forem iguais)
+                addMerges(0);
+                addMerges(1);
+                addMerges(2);
+                addMerges(3);
+                addMerges(5);
             }
             
-            // Configurar largura das colunas
             ws['!cols'] = [
-                { wch: 12 }, // Semana
-                { wch: 20 }, // Data
-                { wch: 35 }, // Subject
-                { wch: 35 }, // System
-                { wch: 60 }, // Aulas
-                { wch: 10 }, // Duração
-                { wch: 12 }, // Status
-                { wch: 30 }  // Anotações
+                { wch: 12 },
+                { wch: 20 },
+                { wch: 35 },
+                { wch: 35 },
+                { wch: 60 },
+                { wch: 10 },
+                { wch: 12 },
+                { wch: 30 }
             ];
             
-            // Aplicar estilos e cores alternadas por semana
             const colors = ['E0F2FE', 'F0FDF4', 'FEF3C7', 'FCE7F3'];
             
             for (let i = 0; i < scheduleData.length; i++) {
@@ -4527,7 +4546,6 @@ const courseData = {
             XLSX.writeFile(wb, fileName);
         }
         
-        // Inicialização
         window.onload = function() {
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
@@ -4545,7 +4563,6 @@ const courseData = {
                 });
             });
             
-            // Listeners para atualizar configurações de dias alternados
             for (let day = 0; day < 7; day++) {
                 const freqSelect = document.getElementById(`alt-freq-${day}`);
                 if (freqSelect) {
@@ -4568,7 +4585,6 @@ const courseData = {
                 });
             }
             
-            // Listener para days off semanais
             document.querySelectorAll('.weekday-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', updateDaysOffSummary);
             });
